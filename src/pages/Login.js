@@ -39,7 +39,7 @@ export default function Login() {
         } else if (data.message === "Codename and password do not match") {
           notyf.error("Incorrect codename or password");
         } else {
-          notyf.error(`${email} does not exist`);
+          notyf.error(`${codename} does not exist`);
         }
       });
   }
@@ -74,7 +74,50 @@ export default function Login() {
     return <Navigate to="/" />;
   }
 
+  return (
+    <div className="login-container" style={{ maxWidth: '400px', margin: '0 auto', padding: '20px' }}>
+      <h1 className="text-center my-5">Log In</h1>
+      <Form onSubmit={authenticate}>
+        <Form.Group className="mb-3">
+          <Form.Label>Codename:</Form.Label>
+          <Form.Control
+            type="text"
+            placeholder="Enter your codename"
+            required
+            value={codename}
+            onChange={(e) => setCodeName(e.target.value)}
+          />
+        </Form.Group>
 
+        <Form.Group className="mb-4">
+          <Form.Label>Password:</Form.Label>
+          <Form.Control
+            type="password"
+            placeholder="Enter your password"
+            required
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+        </Form.Group>
+
+        <hr className="mb-4" />
+
+        <Button
+          variant={isActive ? "primary" : "secondary"}
+          type="submit"
+          id="loginBtn"
+          disabled={!isActive}
+          className="w-100 mb-3"
+        >
+          Submit
+        </Button>
+
+        <p className="text-center mt-3">
+          Don't have an account yet? <Link to="/register">Click here</Link> to register.
+        </p>
+      </Form>
+    </div>
+  )
 
 
 }
