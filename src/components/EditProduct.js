@@ -60,7 +60,18 @@ export default function EditProduct({ product, fetchData, show, onHide }) {
   };
 
   return (
-    
+    <Modal show={show} onHide={onHide}>
+      <Form onSubmit={editProduct}>
+        <Modal.Header closeButton>
+          <Modal.Title>Edit Product</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form.Group controlId="productName" className="mb-3">
+            <Form.Label>Name</Form.Label>
+          </Form.Group>
+        </Modal.Body>
+      </Form>
+    </Modal>
   )
 
 }
