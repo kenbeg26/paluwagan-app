@@ -68,8 +68,52 @@ export default function EditProduct({ product, fetchData, show, onHide }) {
         <Modal.Body>
           <Form.Group controlId="productName" className="mb-3">
             <Form.Label>Name</Form.Label>
+            <Form.control
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+            />
+          </Form.Group>
+
+          <Form.Group controlId="productCategory" className="mb-3">
+            <Form.Label>Category</Form.Label>
+            <Form.Control
+              type="text"
+              value={category}
+              onChange={(e) => setDescription(e.target.value)}
+              required
+            />
+          </Form.Group>
+
+          <Form.Group controlId="productAmount" className="mb-3">
+            <Form.Label>Amount</Form.Label>
+            <Form.Control
+              type="number"
+              value={amount}
+              onChange={(e) => setDescription(e.target.value)}
+              required
+            />
+          </Form.Group>
+
+          <Form.Group controlId="productNumber" className="mb-3">
+            <Form.Label>Number</Form.Label>
+            <Form.Control
+              type="number"
+              value={number}
+              onChange={(e) => setDescription(e.target.value)}
+              required
+            />
           </Form.Group>
         </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={onHide}>
+            Cancel
+          </Button>
+          <Button variant="primary" type="submit" disabled={isLoading}>
+            {isLoading ? 'Saving...' : 'Save Changes'}
+          </Button>
+        </Modal.Footer>
       </Form>
     </Modal>
   )
