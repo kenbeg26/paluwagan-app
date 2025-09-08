@@ -81,7 +81,7 @@ export default function EditProduct({ product, fetchData, show, onHide }) {
             <Form.Control
               type="text"
               value={category}
-              onChange={(e) => setDescription(e.target.value)}
+              onChange={(e) => setCategory(e.target.value)}
               required
             />
           </Form.Group>
@@ -91,7 +91,7 @@ export default function EditProduct({ product, fetchData, show, onHide }) {
             <Form.Control
               type="number"
               value={amount}
-              onChange={(e) => setDescription(e.target.value)}
+              onChange={(e) => setAmount(e.target.value)}
               required
             />
           </Form.Group>
@@ -101,7 +101,7 @@ export default function EditProduct({ product, fetchData, show, onHide }) {
             <Form.Control
               type="number"
               value={number}
-              onChange={(e) => setDescription(e.target.value)}
+              onChange={(e) => setNumber(e.target.value)}
               required
             />
           </Form.Group>

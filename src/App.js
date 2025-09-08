@@ -8,6 +8,7 @@ import Register from './pages/Register';
 import Login from './pages/Login';
 import Logout from './pages/Logout';
 import Home from './pages/Home';
+import AdminDashboard from './components/AdminDashboard';
 
 function App() {
   const [user, setUser] = useState({
@@ -53,6 +54,7 @@ function App() {
             <Route path="/register" element={<Register />} />
             <Route path="/login" element={<Login />} />
             <Route path="/logout" element={<Logout />} />
+            <Route path="/adminDashboard" element={<AdminDashboard />} />
           </Routes>
         </Container>
       </Router>
