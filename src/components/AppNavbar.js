@@ -17,6 +17,7 @@ export default function AppNavbar() {
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="ms-auto">
             <Nav.Link as={NavLink} to="/">Home</Nav.Link>
+            <Nav.Link as={NavLink} to="/products">Products</Nav.Link>
             <Nav.Link as={NavLink} to="/adminDashboard">Admin Dashboard</Nav.Link>
             <Nav.Link as={NavLink} to="/logout">Logout</Nav.Link>
             <Nav.Link as={NavLink} to="/register">Register</Nav.Link>
