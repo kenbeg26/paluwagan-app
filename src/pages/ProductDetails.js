@@ -71,6 +71,7 @@ export default function ProductDetails() {
     );
   }
 
+
   if (!product) {
     return (
       <Container className="py-5">
@@ -82,6 +83,7 @@ export default function ProductDetails() {
       </Container>
     );
   }
+
 
   return (
     <Container className="py-5">
@@ -118,8 +120,7 @@ export default function ProductDetails() {
                   </Card.Text>
 
                   <div className="mb-4">
-                    <h3 className="text-primary fw-bold">{formatPrice(product.price)}</h3>
-                    <small className="text-muted">Inclusive of VAT</small>
+                    <h3 className="text-primary fw-bold">{formatPrice(product.amount)}</h3>
                   </div>
 
                 </Card.Body>
