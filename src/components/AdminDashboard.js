@@ -58,7 +58,11 @@ const AdminDashboard = () => {
   return (
     <Container className="py-4" fluid="md">
       <h2 className="text-center mb-4">Admin Dashboard</h2>
-      <Stack direction="horizontal" gap={3} className="justify-content-center mb-4 flex-wrap">
+      <Stack
+        direction="horizontal"
+        gap={3}
+        className="justify-content-center mb-4 flex-wrap"
+      >
         <Button
           variant="secondary"
           className="btn-hover-effect"
@@ -75,26 +79,54 @@ const AdminDashboard = () => {
               <Card.Body>
                 <Card.Title>{product.name}</Card.Title>
                 <Card.Text>
-                  <small className="text-muted">ID: {product._id.substring(0, 8)}...</small>
+                  <small className="text-muted">
+                    ID: {product._id.substring(0, 8)}...
+                  </small>
                 </Card.Text>
                 <Card.Text className="text-truncate">{product.category}</Card.Text>
                 <Card.Text>Amount: ₱{product.amount.toFixed(2)}</Card.Text>
                 <Card.Text>Number: {product.number.toFixed(2)}</Card.Text>
+
+                {/* Status Badges */}
                 <Card.Text>
-                  Status: <Badge bg={product.isActive ? "success" : "secondary"}>
-                    {product.isActive ? "Available" : "Unavailable"}
+                  Active:{" "}
+                  <Badge bg={product.isActive ? "success" : "secondary"}>
+                    {product.isActive ? "Yes" : "No"}
                   </Badge>
                 </Card.Text>
-                <Stack direction="horizontal" gap={2} className="justify-content-center">
-                  <Button variant="warning" size="sm" onClick={() => handleEdit(product)}>
+                <Card.Text>
+                  Occupied:{" "}
+                  <Badge bg={product.isOccupied ? "danger" : "secondary"}>
+                    {product.isOccupied ? "Yes" : "No"}
+                  </Badge>
+                </Card.Text>
+
+                <Stack
+                  direction="horizontal"
+                  gap={2}
+                  className="justify-content-center"
+                >
+                  <Button
+                    variant="warning"
+                    size="sm"
+                    onClick={() => handleEdit(product)}
+                  >
                     Edit
                   </Button>
                   {product.isActive ? (
-                    <Button variant="danger" size="sm" onClick={() => handleDisable(product)}>
+                    <Button
+                      variant="danger"
+                      size="sm"
+                      onClick={() => handleDisable(product)}
+                    >
                       Disable
                     </Button>
                   ) : (
-                    <Button variant="success" size="sm" onClick={() => handleActivate(product)}>
+                    <Button
+                      variant="success"
+                      size="sm"
+                      onClick={() => handleActivate(product)}
+                    >
                       Activate
                     </Button>
                   )}
@@ -112,34 +144,61 @@ const AdminDashboard = () => {
               <th>Category</th>
               <th>Amount (₱)</th>
               <th>Number</th>
-              <th>Status</th>
+              <th>Active</th>
+              <th>Occupied</th>
               <th className="text-center">Actions</th>
             </tr>
           </thead>
           <tbody>
             {products.map((product) => (
               <tr key={product._id}>
-                <td style={{ maxWidth: "150px", wordWrap: "break-word" }}>{product._id}</td>
+                <td style={{ maxWidth: "150px", wordWrap: "break-word" }}>
+                  {product._id}
+                </td>
                 <td>{product.name}</td>
-                <td style={{ maxWidth: "300px", wordWrap: "break-word" }}>{product.category}</td>
+                <td style={{ maxWidth: "300px", wordWrap: "break-word" }}>
+                  {product.category}
+                </td>
                 <td>{product.amount.toFixed(2)}</td>
                 <td>{product.number.toFixed(2)}</td>
+
+                {/* Active Badge */}
                 <td>
                   <Badge bg={product.isActive ? "success" : "secondary"}>
-                    {product.isActive ? "Available" : "Unavailable"}
+                    {product.isActive ? "Yes" : "No"}
                   </Badge>
                 </td>
+
+                {/* Occupied Badge */}
+                <td>
+                  <Badge bg={product.isOccupied ? "danger" : "secondary"}>
+                    {product.isOccupied ? "Yes" : "No"}
+                  </Badge>
+                </td>
+
                 <td className="text-center">
                   <div className="d-flex justify-content-center flex-wrap gap-2">
-                    <Button variant="warning" size="sm" onClick={() => handleEdit(product)}>
+                    <Button
+                      variant="warning"
+                      size="sm"
+                      onClick={() => handleEdit(product)}
+                    >
                       Edit
                     </Button>
                     {product.isActive ? (
-                      <Button variant="danger" size="sm" onClick={() => handleDisable(product)}>
+                      <Button
+                        variant="danger"
+                        size="sm"
+                        onClick={() => handleDisable(product)}
+                      >
                         Disable
                       </Button>
                     ) : (
-                      <Button variant="success" size="sm" onClick={() => handleActivate(product)}>
+                      <Button
+                        variant="success"
+                        size="sm"
+                        onClick={() => handleActivate(product)}
+                      >
                         Activate
                       </Button>
                     )}

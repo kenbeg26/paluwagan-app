@@ -2,13 +2,16 @@ import { useState, useEffect } from 'react';
 import { Button, Modal, Form } from 'react-bootstrap';
 import { Notyf } from 'notyf';
 
+const notyf = new Notyf(); // moved outside so it's not recreated every render
+
 export default function EditProduct({ product, fetchData, show, onHide }) {
-  const notyf = new Notyf();
   const [name, setName] = useState('');
   const [category, setCategory] = useState('');
   const [amount, setAmount] = useState('');
   const [number, setNumber] = useState('');
-  const [isLoading, setIsLoading] = useState('');
+  const [isActive, setIsActive] = useState(false);
+  const [isOccupied, setIsOccupied] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (product) {
@@ -16,6 +19,8 @@ export default function EditProduct({ product, fetchData, show, onHide }) {
       setCategory(product.category || '');
       setAmount(product.amount || 0);
       setNumber(product.number || 0);
+      setIsActive(product.isActive ?? false);
+      setIsOccupied(product.isOccupied ?? false);
     }
   }, [product]);
 
@@ -24,19 +29,24 @@ export default function EditProduct({ product, fetchData, show, onHide }) {
     setIsLoading(true);
 
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/product/${product._id}/update`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
-        body: JSON.stringify({
-          name,
-          category,
-          amount: Number(amount),
-          number: Number(number)
-        }),
-      });
+      const response = await fetch(
+        `${process.env.REACT_APP_API_BASE_URL}/product/${product._id}/update`,
+        {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+          },
+          body: JSON.stringify({
+            name,
+            category,
+            amount: Number(amount),
+            number: Number(number),
+            isActive,
+            isOccupied,
+          }),
+        }
+      );
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -45,11 +55,11 @@ export default function EditProduct({ product, fetchData, show, onHide }) {
       const data = await response.json();
 
       if (data.success) {
-        notyf.success("Successfully Updated");
+        notyf.success('Successfully Updated');
         fetchData();
         onHide();
       } else {
-        notyf.error(data.message || "Update failed");
+        notyf.error(data.message || 'Update failed');
       }
     } catch (error) {
       console.error('Edit error:', error);
@@ -68,7 +78,7 @@ export default function EditProduct({ product, fetchData, show, onHide }) {
         <Modal.Body>
           <Form.Group controlId="productName" className="mb-3">
             <Form.Label>Name</Form.Label>
-            <Form.control
+            <Form.Control
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
@@ -105,6 +115,25 @@ export default function EditProduct({ product, fetchData, show, onHide }) {
               required
             />
           </Form.Group>
+
+          {/* New fields */}
+          <Form.Group controlId="productIsActive" className="mb-3">
+            <Form.Check
+              type="checkbox"
+              label="Active"
+              checked={isActive}
+              onChange={(e) => setIsActive(e.target.checked)}
+            />
+          </Form.Group>
+
+          <Form.Group controlId="productIsOccupied" className="mb-3">
+            <Form.Check
+              type="checkbox"
+              label="Occupied"
+              checked={isOccupied}
+              onChange={(e) => setIsOccupied(e.target.checked)}
+            />
+          </Form.Group>
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={onHide}>
@@ -116,6 +145,5 @@ export default function EditProduct({ product, fetchData, show, onHide }) {
         </Modal.Footer>
       </Form>
     </Modal>
-  )
-
+  );
 }
