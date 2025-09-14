@@ -53,7 +53,7 @@ export default function ProductCatalog() {
 
   return (
     <Container className="py-5">
-      <h1 className="mb-4 text-center">Paluwagan Schedule</h1>
+      <h1 className="mb-4 text-center">Paluwagan</h1>
 
       <Row xs={1} md={2} lg={3} className="g-4">
         {products.map((product) => (
@@ -68,7 +68,8 @@ export default function ProductCatalog() {
                   <Card.Text className="text-muted mb-3 flex-grow-1">
                     {product.name}
                   </Card.Text>
-                  <h5 className="text-primary mb-3">{formatPrice(product.amount)}</h5>
+                  <Card.Text>{formatPrice(product.amount)}</Card.Text>
+                  <h5 className="text-primary mb-3">{formatPrice(100000)}</h5>
                 </Card.Body>
               </Link>
               <Card.Body className="pt-0">

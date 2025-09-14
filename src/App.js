@@ -11,6 +11,7 @@ import Home from './pages/Home';
 import AdminDashboard from './components/AdminDashboard';
 import ProductCatalog from './pages/ProductCatalog';
 import ProductDetails from './pages/ProductDetails';
+import Schedule from './pages/Schedule';
 
 function App() {
   const [user, setUser] = useState({
@@ -58,6 +59,7 @@ function App() {
             <Route path="/logout" element={<Logout />} />
             <Route path="/adminDashboard" element={<AdminDashboard />} />
             <Route path="/products" element={<ProductCatalog />} />
+            <Route path="/schedule" element={<Schedule />} />
             <Route path="/products/:id" element={<ProductDetails />} />
           </Routes>
         </Container>
