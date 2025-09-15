@@ -62,7 +62,6 @@ export default function ProductCatalog() {
             <th>Product Name</th>
             <th>Amount</th>
             <th>Total</th>
-            <th>Action</th>
           </tr>
         </thead>
         <tbody>
@@ -72,16 +71,6 @@ export default function ProductCatalog() {
               <td>{product.name}</td>
               <td>{formatPrice(product.amount)}</td>
               <td>{formatPrice(100000)}</td>
-              <td>
-                <Button
-                  as={Link}
-                  to={`/products/${product._id}`}
-                  variant="primary"
-                  size="sm"
-                >
-                  View Details
-                </Button>
-              </td>
             </tr>
           ))}
         </tbody>

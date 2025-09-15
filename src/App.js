@@ -10,8 +10,8 @@ import Logout from './pages/Logout';
 import Home from './pages/Home';
 import AdminDashboard from './components/AdminDashboard';
 import ProductCatalog from './pages/ProductCatalog';
-import ProductDetails from './pages/ProductDetails';
 import Schedule from './pages/Schedule';
+import Chat from './components/Chat'
 
 function App() {
   const [user, setUser] = useState({
@@ -60,7 +60,7 @@ function App() {
             <Route path="/adminDashboard" element={<AdminDashboard />} />
             <Route path="/products" element={<ProductCatalog />} />
             <Route path="/schedule" element={<Schedule />} />
-            <Route path="/products/:id" element={<ProductDetails />} />
+            <Route path="/chat" element={<Chat />} />
           </Routes>
         </Container>
       </Router>
