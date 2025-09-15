@@ -22,6 +22,7 @@ export default function PickSchedule() {
   const [spinning, setSpinning] = useState(false);
   const [rotation, setRotation] = useState(0);
   const [hasSchedule, setHasSchedule] = useState(false); // ✅ New state
+  const [selectedIndex, setSelectedIndex] = useState(null);
 
   const colors = ["#f87171", "#60a5fa", "#34d399", "#fbbf24", "#a78bfa", "#f472b6"];
 
@@ -79,6 +80,7 @@ export default function PickSchedule() {
 
       const randomSpins = Math.floor(Math.random() * 5) + 5;
       const randomIndex = Math.floor(Math.random() * products.length);
+      setSelectedIndex(randomIndex); // Store selected slice
       const anglePerSlice = 360 / products.length;
 
       const finalAngle = 360 - randomIndex * anglePerSlice - anglePerSlice / 2 + 90;
@@ -217,21 +219,25 @@ export default function PickSchedule() {
             </div>
           )}
 
-          {/* Pointer */}
-          <div
-            style={{
-              position: "absolute",
-              top: "0",
-              left: "50%",
-              transform: "translateX(-50%)",
-              width: 0,
-              height: 0,
-              borderLeft: "15px solid transparent",
-              borderRight: "15px solid transparent",
-              borderBottom: "25px solid red",
-              zIndex: 20,
-            }}
-          />
+          {/* Pointer positioned based on selected slice */}
+          {selectedIndex !== null && (
+            <div
+              style={{
+                position: "absolute",
+                top: "50%",
+                left: "50%",
+                transform: `translate(-50%, -50%) rotate(${selectedIndex * (360 / products.length)}deg)`,
+                transformOrigin: "bottom center",
+                width: 0,
+                height: 0,
+                borderLeft: "15px solid transparent",
+                borderRight: "15px solid transparent",
+                borderBottom: "25px solid red",
+                zIndex: 20,
+              }}
+            />
+          )}
+
         </div>
       </div>
 

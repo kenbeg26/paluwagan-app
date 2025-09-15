@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Card, Button, Container, Row, Col, Spinner } from 'react-bootstrap';
+import { Container, Spinner, Table, Button } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { Notyf } from 'notyf';
 import 'notyf/notyf.min.css';
@@ -55,37 +55,37 @@ export default function ProductCatalog() {
     <Container className="py-5">
       <h1 className="mb-4 text-center">Paluwagan</h1>
 
-      <Row xs={1} md={2} lg={3} className="g-4">
-        {products.map((product) => (
-          <Col key={product._id}>
-            <Card className="h-100 shadow-sm product-card">
-              <Link
-                to={`/product/${product._id}`}
-                style={{ textDecoration: 'none', color: 'inherit' }}
-              >
-                <Card.Body className="d-flex flex-column">
-                  <Card.Title className="mb-2">{product.category}</Card.Title>
-                  <Card.Text className="text-muted mb-3 flex-grow-1">
-                    {product.name}
-                  </Card.Text>
-                  <Card.Text>{formatPrice(product.amount)}</Card.Text>
-                  <h5 className="text-primary mb-3">{formatPrice(100000)}</h5>
-                </Card.Body>
-              </Link>
-              <Card.Body className="pt-0">
+      <Table striped bordered hover responsive>
+        <thead>
+          <tr>
+            <th>Category</th>
+            <th>Product Name</th>
+            <th>Amount</th>
+            <th>Total</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {products.map((product) => (
+            <tr key={product._id}>
+              <td>{product.category}</td>
+              <td>{product.name}</td>
+              <td>{formatPrice(product.amount)}</td>
+              <td>{formatPrice(100000)}</td>
+              <td>
                 <Button
                   as={Link}
                   to={`/products/${product._id}`}
                   variant="primary"
-                  className="mt-auto w-100"
+                  size="sm"
                 >
                   View Details
                 </Button>
-              </Card.Body>
-            </Card>
-          </Col>
-        ))}
-      </Row>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </Table>
     </Container>
   );
 }
