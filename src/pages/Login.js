@@ -1,15 +1,15 @@
-import { useState, useEffect, useContext } from 'react';
-import { Form, Button } from 'react-bootstrap';
-import { Navigate, Link } from 'react-router-dom';
-import UserContext from '../context/UserContext';
+import { useState, useEffect, useContext } from "react";
+import { Form, Button } from "react-bootstrap";
+import { Navigate, Link } from "react-router-dom";
+import UserContext from "../context/UserContext";
 
-import { Notyf } from 'notyf';
-import 'notyf/notyf.min.css';
+import { Notyf } from "notyf";
+import "notyf/notyf.min.css";
 
 const notyf = new Notyf();
 
 export default function Login() {
-  const { user, setUser } = useContext(UserContext);
+  const { user, setUser, setToken } = useContext(UserContext);
 
   const [codename, setCodeName] = useState("");
   const [password, setPassword] = useState("");
@@ -18,52 +18,65 @@ export default function Login() {
   function authenticate(e) {
     e.preventDefault();
     fetch(`${process.env.REACT_APP_API_BASE_URL}/users/login`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
         codename: codename,
-        password: password
-      })
+        password: password,
+      }),
     })
-      .then(res => res.json())
-      .then(data => {
+      .then((res) => res.json())
+      .then((data) => {
         if (data.access !== undefined) {
-          localStorage.setItem('token', data.access);
-          console.log('Token received:', data.access);
+          console.log("Token received:", data.access);
+
+          // Store token in context (UserContext manages localStorage sync)
+          setToken(data.access);
+
+          // Fetch user details with token
           retrieveUserDetails(data.access);
-          setCodeName('');
-          setPassword('');
+
+          setCodeName("");
+          setPassword("");
           notyf.success("You are now logged in!");
         } else if (data.message === "Codename and password do not match") {
           notyf.error("Incorrect codename or password");
         } else {
           notyf.error(`${codename} does not exist`);
         }
+      })
+      .catch((err) => {
+        console.error("Login error:", err);
+        notyf.error("Something went wrong. Please try again.");
       });
   }
 
   function retrieveUserDetails(token) {
     fetch(`${process.env.REACT_APP_API_BASE_URL}/users/details`, {
       headers: {
-        Authorization: `Bearer ${token}`
-      }
+        Authorization: `Bearer ${token}`,
+      },
     })
-      .then(res => res.json())
-      .then(data => {
-        console.log('User details response:', data); // helpful debug log
+      .then((res) => res.json())
+      .then((data) => {
+        console.log("User details response:", data);
         setUser({
           id: data.user._id,
           isAdmin: data.user.isAdmin,
           codename: data.user.codename,
-          isActive: data.user.isActive
+          isActive: data.user.isActive,
         });
+      })
+      .catch((err) => {
+        console.error("User details fetch error:", err);
+        notyf.error("Failed to fetch user details.");
       });
   }
 
   useEffect(() => {
-    if (codename !== '' && password !== '') {
+    if (codename !== "" && password !== "") {
       setIsActive(true);
     } else {
       setIsActive(false);
@@ -75,7 +88,10 @@ export default function Login() {
   }
 
   return (
-    <div className="login-container" style={{ maxWidth: '400px', margin: '0 auto', padding: '20px' }}>
+    <div
+      className="login-container"
+      style={{ maxWidth: "400px", margin: "0 auto", padding: "20px" }}
+    >
       <h1 className="text-center my-5">Log In</h1>
       <Form onSubmit={authenticate}>
         <Form.Group className="mb-3">
@@ -113,11 +129,10 @@ export default function Login() {
         </Button>
 
         <p className="text-center mt-3">
-          Don't have an account yet? <Link to="/register">Click here</Link> to register.
+          Don't have an account yet? <Link to="/register">Click here</Link> to
+          register.
         </p>
       </Form>
     </div>
-  )
-
-
+  );
 }

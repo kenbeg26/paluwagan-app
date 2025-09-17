@@ -1,26 +1,25 @@
-import { Navigate } from 'react-router-dom';
-import { useEffect, useContext } from 'react';
-
-import UserContext from '../context/UserContext';
+import { Navigate } from "react-router-dom";
+import { useEffect, useContext } from "react";
+import UserContext from "../context/UserContext";
 
 export default function Logout() {
-  // Consume the UserContext object and destructure it to access the user state and unsetUser function from the context provider
-  const { setUser, unsetUser } = useContext(UserContext);
+  const { setUser, setToken } = useContext(UserContext);
 
-  // Clear the localStorage of the user's information
-  // localStorage.clear()
-  unsetUser();
-
-  // Placing the "setUser" function inside of a useEffect is necessary because a state of another component cannot be updated while trying to render a different component
-  // By adding the useEffect, this will allow the Logout page to render first before triggering the useEffect which changes the state of our user 
   useEffect(() => {
+    // Clear user state
     setUser({
       id: null,
-      isAdmin: null
-    })
-  }, [setUser])
-  //Redirects you back to login
-  return (
-    <Navigate to='/login' />
-  )
+      isAdmin: null,
+      codename: null,
+      isActive: null,
+    });
+
+    // Clear token state
+    setToken(null);
+
+    // Clear localStorage explicitly (optional, since setToken already syncs)
+    localStorage.removeItem("token");
+  }, [setUser, setToken]);
+
+  return <Navigate to="/login" />;
 }

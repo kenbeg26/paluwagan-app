@@ -49,7 +49,7 @@ export default function PickSchedule() {
     const checkSchedule = async () => {
       if (!user) return; // only check if logged in
       try {
-        const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/schedule/my-schedule`, {
+        const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/schedule/get-schedule`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },

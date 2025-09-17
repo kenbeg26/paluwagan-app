@@ -20,7 +20,7 @@ export default function Chat() {
     if (!user?.token) return;
 
     const newSocket = io("http://localhost:4000", {
-      auth: { token: user.token }, // pass JWT
+      auth: { token: user.token }, // ✅ send JWT
     });
 
     // Chat history
@@ -33,6 +33,11 @@ export default function Chat() {
       setMessages((prev) => [...prev, msg]);
     });
 
+    // Handle auth errors
+    newSocket.on("connect_error", (err) => {
+      console.error("Socket auth error:", err.message);
+    });
+
     setSocket(newSocket);
 
     return () => {
@@ -42,7 +47,7 @@ export default function Chat() {
 
   const sendMessage = () => {
     if (message.trim() && socket) {
-      socket.emit("sendMessage", { message });
+      socket.emit("sendMessage", { message }); // ✅ no need to send userId
       setMessage("");
     }
   };
