@@ -32,7 +32,10 @@ export default function Login() {
         if (data.access !== undefined) {
           console.log("Token received:", data.access);
 
-          // Store token in context (UserContext manages localStorage sync)
+          // ✅ Save token to localStorage
+          localStorage.setItem("token", data.access);
+
+          // ✅ Store token in context (so Chat.js can read it)
           setToken(data.access);
 
           // Fetch user details with token
@@ -62,11 +65,14 @@ export default function Login() {
       .then((res) => res.json())
       .then((data) => {
         console.log("User details response:", data);
+
+        // ✅ Merge token with user details
         setUser({
           id: data.user._id,
           isAdmin: data.user.isAdmin,
           codename: data.user.codename,
           isActive: data.user.isActive,
+          token, // ✅ store token here too
         });
       })
       .catch((err) => {

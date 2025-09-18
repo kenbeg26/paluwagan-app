@@ -3,51 +3,55 @@ import io from "socket.io-client";
 import UserContext from "../context/UserContext";
 
 export default function Chat() {
-  const { user } = useContext(UserContext); // expected { _id, codename, token }
+  const { user, token: contextToken } = useContext(UserContext);
   const [socket, setSocket] = useState(null);
   const [messages, setMessages] = useState([]);
   const [message, setMessage] = useState("");
   const messagesEndRef = useRef(null);
 
-  // Auto-scroll
+  // ✅ Get token from context first, fallback to localStorage
+  const token = contextToken || localStorage.getItem("token");
+
+  // Auto-scroll to bottom when messages update
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
   useEffect(scrollToBottom, [messages]);
 
-  // Initialize socket connection when user logs in
+  // Initialize socket connection
+  // Add error handling
   useEffect(() => {
-    if (!user?.token) return;
+    if (!token) return;
 
     const newSocket = io("http://localhost:4000", {
-      auth: { token: user.token }, // ✅ send JWT
+      auth: { token },
     });
 
-    // Chat history
-    newSocket.on("chatHistory", (history) => {
-      setMessages(history);
+    newSocket.on("connect", () => {
+      console.log("Connected to server");
     });
 
-    // New messages
-    newSocket.on("receiveMessage", (msg) => {
-      setMessages((prev) => [...prev, msg]);
-    });
-
-    // Handle auth errors
     newSocket.on("connect_error", (err) => {
-      console.error("Socket auth error:", err.message);
+      console.error("Connection error:", err.message);
     });
+
+    newSocket.on("error", (error) => {
+      console.error("Socket error:", error);
+      alert(error.message || "An error occurred");
+    });
+
+    // ... rest of your socket handlers
 
     setSocket(newSocket);
 
     return () => {
       newSocket.disconnect();
     };
-  }, [user?.token]);
+  }, [token]);
 
   const sendMessage = () => {
     if (message.trim() && socket) {
-      socket.emit("sendMessage", { message }); // ✅ no need to send userId
+      socket.emit("sendMessage", { message });
       setMessage("");
     }
   };
@@ -77,27 +81,25 @@ export default function Chat() {
       <div style={{ marginTop: "10px" }}>
         <input
           type="text"
-          placeholder={
-            user?.token ? "Type your message..." : "Login to send messages"
-          }
+          placeholder={token ? "Type your message..." : "Login to send messages"}
           value={message}
-          disabled={!user?.token}
+          disabled={!token}
           onChange={(e) => setMessage(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && sendMessage()}
           style={{ width: "80%", padding: "8px" }}
         />
         <button
           onClick={sendMessage}
-          disabled={!user?.token}
+          disabled={!token}
           style={{
             width: "18%",
             marginLeft: "2%",
             padding: "8px",
-            backgroundColor: user?.token ? "#007bff" : "#aaa",
+            backgroundColor: token ? "#007bff" : "#aaa",
             color: "white",
             border: "none",
             borderRadius: "4px",
-            cursor: user?.token ? "pointer" : "not-allowed",
+            cursor: token ? "pointer" : "not-allowed",
           }}
         >
           Send
