@@ -1,3 +1,4 @@
+// Chat.js
 import React, { useEffect, useState, useContext, useRef } from "react";
 import io from "socket.io-client";
 import UserContext from "../context/UserContext";
@@ -18,8 +19,7 @@ export default function Chat() {
   };
   useEffect(scrollToBottom, [messages]);
 
-  // Initialize socket connection
-  // Add error handling
+  // Initialize socket connection + event listeners
   useEffect(() => {
     if (!token) return;
 
@@ -28,19 +28,27 @@ export default function Chat() {
     });
 
     newSocket.on("connect", () => {
-      console.log("Connected to server");
+      console.log("✅ Connected to server");
     });
 
     newSocket.on("connect_error", (err) => {
-      console.error("Connection error:", err.message);
+      console.error("❌ Connection error:", err.message);
     });
 
     newSocket.on("error", (error) => {
-      console.error("Socket error:", error);
+      console.error("⚠️ Socket error:", error);
       alert(error.message || "An error occurred");
     });
 
-    // ... rest of your socket handlers
+    // ✅ Receive chat history from backend on connect
+    newSocket.on("chatHistory", (history) => {
+      setMessages(history);
+    });
+
+    // ✅ Listen for new messages from backend
+    newSocket.on("receiveMessage", (msg) => {
+      setMessages((prev) => [...prev, msg]);
+    });
 
     setSocket(newSocket);
 
@@ -49,6 +57,7 @@ export default function Chat() {
     };
   }, [token]);
 
+  // Send a message
   const sendMessage = () => {
     if (message.trim() && socket) {
       socket.emit("sendMessage", { message });
@@ -60,6 +69,7 @@ export default function Chat() {
     <div style={{ padding: "20px", maxWidth: "500px", margin: "auto" }}>
       <h2>Group Chat</h2>
 
+      {/* Messages Box */}
       <div
         style={{
           border: "1px solid #ccc",
@@ -78,6 +88,7 @@ export default function Chat() {
         <div ref={messagesEndRef} />
       </div>
 
+      {/* Input + Send */}
       <div style={{ marginTop: "10px" }}>
         <input
           type="text"
