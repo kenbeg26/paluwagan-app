@@ -7,6 +7,7 @@ import {
   Spinner,
   Badge,
   Button,
+  Alert,
 } from "react-bootstrap";
 import axios from "axios";
 import io from "socket.io-client";
@@ -117,68 +118,76 @@ export default function Schedule() {
 
   return (
     <Container className="mt-4">
-      <Row xs={1} md={2} lg={3} className="g-4">
-        {schedules.map((schedule) => (
-          <Col key={schedule._id}>
-            <Card className="h-100">
-              <Card.Body>
-                <Card.Title>
-                  {schedule.scheduleOrdered[0]?.productId?.category || "Unknown Category"}
-                </Card.Title>
-                <p>{schedule.userId?.codename || "Unknown User"}</p>
+      {/* 🚨 If user is inactive, block schedules */}
+      {user && !user.isActive ? (
+        <Alert variant="warning" className="text-center">
+          🚫 You're not an active user
+        </Alert>
+      ) : (
+        <Row xs={1} md={2} lg={3} className="g-4">
+          {schedules.map((schedule) => (
+            <Col key={schedule._id}>
+              <Card className="h-100">
+                <Card.Body>
+                  <Card.Title>
+                    {schedule.scheduleOrdered[0]?.productId?.category || "Unknown Category"}
+                  </Card.Title>
+                  <p>{schedule.userId?.codename || "Unknown User"}</p>
 
-                {schedule.scheduleOrdered.map((item) => {
-                  const userPaid = item.payments?.some((p) => p.userId === user.id);
-                  const totalPaidCount = item.payments?.filter(
-                    (p) => p.status === "paid"
-                  ).length;
+                  {schedule.scheduleOrdered.map((item) => {
+                    const userPaid = item.payments?.some((p) => p.userId === user.id);
+                    const totalPaidCount = item.payments?.filter(
+                      (p) => p.status === "paid"
+                    ).length;
 
-                  return (
-                    <div key={item._id} className="mb-3 p-2 border rounded">
-                      <h6>Schedule: {item.productId.name}</h6>
-                      <p>
-                        Amount: ₱{item.productId.amount.toLocaleString()} | Number: {item.productId.number}
-                      </p>
+                    return (
+                      <div key={item._id} className="mb-3 p-2 border rounded">
+                        <h6>Schedule: {item.productId.name}</h6>
+                        <p>
+                          Amount: ₱{item.productId.amount.toLocaleString()} | Number:{" "}
+                          {item.productId.number}
+                        </p>
 
-                      <Badge bg={totalPaidCount > 0 ? "success" : "warning"}>
-                        {totalPaidCount > 0 ? "PAID" : "UNPAID"} ({totalPaidCount} user
-                        {totalPaidCount !== 1 ? "s" : ""} paid)
-                      </Badge>
+                        <Badge bg={totalPaidCount > 0 ? "success" : "warning"}>
+                          {totalPaidCount > 0 ? "PAID" : "UNPAID"} ({totalPaidCount} user
+                          {totalPaidCount !== 1 ? "s" : ""} paid)
+                        </Badge>
 
-                      {!userPaid && (
-                        <div className="mt-2">
-                          <Button
-                            variant="success"
-                            size="sm"
-                            onClick={() =>
-                              handleMarkAsPaid(
-                                schedule._id,
-                                item.productId._id,
-                                item.productId.name,
-                                item.productId.amount
-                              )
-                            }
-                          >
-                            Mark as Paid
-                          </Button>
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </Card.Body>
-              <Card.Footer>
-                <strong>Total Amount: ₱{schedule.totalAmount.toLocaleString()}</strong>
-                <br />
-                Status:{" "}
-                <Badge bg={schedule.status === "settled" ? "success" : "secondary"}>
-                  {schedule.status.toUpperCase()}
-                </Badge>
-              </Card.Footer>
-            </Card>
-          </Col>
-        ))}
-      </Row>
+                        {!userPaid && (
+                          <div className="mt-2">
+                            <Button
+                              variant="success"
+                              size="sm"
+                              onClick={() =>
+                                handleMarkAsPaid(
+                                  schedule._id,
+                                  item.productId._id,
+                                  item.productId.name,
+                                  item.productId.amount
+                                )
+                              }
+                            >
+                              Mark as Paid
+                            </Button>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </Card.Body>
+                <Card.Footer>
+                  <strong>Total Amount: ₱{schedule.totalAmount.toLocaleString()}</strong>
+                  <br />
+                  Status:{" "}
+                  <Badge bg={schedule.status === "settled" ? "success" : "secondary"}>
+                    {schedule.status.toUpperCase()}
+                  </Badge>
+                </Card.Footer>
+              </Card>
+            </Col>
+          ))}
+        </Row>
+      )}
     </Container>
   );
 }
