@@ -66,54 +66,36 @@ export default function Chat() {
   };
 
   return (
-    <div style={{ padding: "20px", maxWidth: "500px", margin: "auto" }}>
-      <h2>Group Chat</h2>
+    <div className="chat-container">
+      <h2 className="chat-title">💵 Paluwagan Hub</h2>
 
       {/* Messages Box */}
-      <div
-        style={{
-          border: "1px solid #ccc",
-          height: "300px",
-          overflowY: "scroll",
-          padding: "10px",
-          borderRadius: "6px",
-          backgroundColor: "#f9f9f9",
-        }}
-      >
+      <div className="chat-messages">
         {messages.map((msg, index) => (
           <p key={msg._id || index}>
-            <strong>{msg.user?.codename || "Unknown"}:</strong> {msg.message}
+            <strong>{msg.user?.codename || "Unknown"} 💰:</strong> {msg.message}
           </p>
         ))}
         <div ref={messagesEndRef} />
       </div>
 
       {/* Input + Send */}
-      <div style={{ marginTop: "10px" }}>
+      <div className="chat-input-container">
         <input
           type="text"
-          placeholder={token ? "Type your message..." : "Login to send messages"}
+          placeholder={token ? "Type your 💸 message..." : "Login to send messages"}
           value={message}
           disabled={!token}
           onChange={(e) => setMessage(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && sendMessage()}
-          style={{ width: "80%", padding: "8px" }}
+          className="chat-input"
         />
         <button
           onClick={sendMessage}
           disabled={!token}
-          style={{
-            width: "18%",
-            marginLeft: "2%",
-            padding: "8px",
-            backgroundColor: token ? "#007bff" : "#aaa",
-            color: "white",
-            border: "none",
-            borderRadius: "4px",
-            cursor: token ? "pointer" : "not-allowed",
-          }}
+          className={`chat-send-btn ${!token ? "disabled" : ""}`}
         >
-          Send
+          Send 💵
         </button>
       </div>
     </div>

@@ -4,3 +4,68 @@
   padding: 0;
   box-sizing: border-box;
 }
+
+/* 💵 Chat Styles - minimalist money theme */
+.chat-container {
+  padding: 20px;
+  max-width: 500px;
+  margin: auto;
+  font-family: Arial, sans-serif;
+}
+
+.chat-title {
+  text-align: center;
+  color: #198754;
+  /* Bootstrap green */
+  margin-bottom: 15px;
+  font-weight: bold;
+}
+
+.chat-messages {
+  border: 1px solid #d1e7dd;
+  height: 300px;
+  overflow-y: auto;
+  padding: 10px;
+  border-radius: 8px;
+  background-color: #f9fff9;
+  /* light green hint */
+  font-size: 0.95rem;
+}
+
+.chat-input-container {
+  margin-top: 10px;
+  display: flex;
+  gap: 8px;
+}
+
+.chat-input {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  outline: none;
+}
+
+.chat-input:focus {
+  border-color: #198754;
+  box-shadow: 0 0 4px rgba(25, 135, 84, 0.3);
+}
+
+.chat-send-btn {
+  padding: 8px 14px;
+  background-color: #198754;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s ease-in-out;
+}
+
+.chat-send-btn:hover {
+  background-color: #157347;
+}
+
+.chat-send-btn.disabled {
+  background-color: #aaa;
+  cursor: not-allowed;
+}
