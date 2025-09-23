@@ -12,6 +12,7 @@ import {
 import axios from "axios";
 import io from "socket.io-client";
 import UserContext from "../context/UserContext";
+import PickSchedule from "../components/PickSchedule"; // ✅ import the component
 
 export default function Schedule() {
   const [schedules, setSchedules] = useState([]);
@@ -124,69 +125,91 @@ export default function Schedule() {
           🚫 You're not an active user
         </Alert>
       ) : (
-        <Row xs={1} md={2} lg={3} className="g-4">
-          {schedules.map((schedule) => (
-            <Col key={schedule._id}>
-              <Card className="h-100">
-                <Card.Body>
-                  <Card.Title>
-                    {schedule.scheduleOrdered[0]?.productId?.category || "Unknown Category"}
-                  </Card.Title>
-                  <p>{schedule.userId?.codename || "Unknown User"}</p>
+        <>
+          {/* ✅ PickSchedule section */}
+          <div className="mb-4">
+            <h3 className="mb-3">Pick a Schedule</h3>
+            <PickSchedule />
+          </div>
 
-                  {schedule.scheduleOrdered.map((item) => {
-                    const userPaid = item.payments?.some((p) => p.userId === user.id);
-                    const totalPaidCount = item.payments?.filter(
-                      (p) => p.status === "paid"
-                    ).length;
+          {/* ✅ Schedules list */}
+          <Row xs={1} md={2} lg={3} className="g-4">
+            {schedules.map((schedule) => (
+              <Col key={schedule._id}>
+                <Card className="h-100">
+                  <Card.Body>
+                    <Card.Title>
+                      {schedule.scheduleOrdered[0]?.productId?.category ||
+                        "Unknown Category"}
+                    </Card.Title>
+                    <p>{schedule.userId?.codename || "Unknown User"}</p>
 
-                    return (
-                      <div key={item._id} className="mb-3 p-2 border rounded">
-                        <h6>Schedule: {item.productId.name}</h6>
-                        <p>
-                          Amount: ₱{item.productId.amount.toLocaleString()} | Number:{" "}
-                          {item.productId.number}
-                        </p>
+                    {schedule.scheduleOrdered.map((item) => {
+                      const userPaid = item.payments?.some(
+                        (p) => p.userId === user.id
+                      );
+                      const totalPaidCount = item.payments?.filter(
+                        (p) => p.status === "paid"
+                      ).length;
 
-                        <Badge bg={totalPaidCount > 0 ? "success" : "warning"}>
-                          {totalPaidCount > 0 ? "PAID" : "UNPAID"} ({totalPaidCount} user
-                          {totalPaidCount !== 1 ? "s" : ""} paid)
-                        </Badge>
+                      return (
+                        <div key={item._id} className="mb-3 p-2 border rounded">
+                          <h6>Schedule: {item.productId.name}</h6>
+                          <p>
+                            Amount: ₱
+                            {item.productId.amount.toLocaleString()} | Number:{" "}
+                            {item.productId.number}
+                          </p>
 
-                        {!userPaid && (
-                          <div className="mt-2">
-                            <Button
-                              variant="success"
-                              size="sm"
-                              onClick={() =>
-                                handleMarkAsPaid(
-                                  schedule._id,
-                                  item.productId._id,
-                                  item.productId.name,
-                                  item.productId.amount
-                                )
-                              }
-                            >
-                              Mark as Paid
-                            </Button>
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                </Card.Body>
-                <Card.Footer>
-                  <strong>Total Amount: ₱{schedule.totalAmount.toLocaleString()}</strong>
-                  <br />
-                  Status:{" "}
-                  <Badge bg={schedule.status === "settled" ? "success" : "secondary"}>
-                    {schedule.status.toUpperCase()}
-                  </Badge>
-                </Card.Footer>
-              </Card>
-            </Col>
-          ))}
-        </Row>
+                          <Badge
+                            bg={totalPaidCount > 0 ? "success" : "warning"}
+                          >
+                            {totalPaidCount > 0 ? "PAID" : "UNPAID"} (
+                            {totalPaidCount} user
+                            {totalPaidCount !== 1 ? "s" : ""} paid)
+                          </Badge>
+
+                          {!userPaid && (
+                            <div className="mt-2">
+                              <Button
+                                variant="success"
+                                size="sm"
+                                onClick={() =>
+                                  handleMarkAsPaid(
+                                    schedule._id,
+                                    item.productId._id,
+                                    item.productId.name,
+                                    item.productId.amount
+                                  )
+                                }
+                              >
+                                Mark as Paid
+                              </Button>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </Card.Body>
+                  <Card.Footer>
+                    <strong>
+                      Total Amount: ₱{schedule.totalAmount.toLocaleString()}
+                    </strong>
+                    <br />
+                    Status:{" "}
+                    <Badge
+                      bg={
+                        schedule.status === "settled" ? "success" : "secondary"
+                      }
+                    >
+                      {schedule.status.toUpperCase()}
+                    </Badge>
+                  </Card.Footer>
+                </Card>
+              </Col>
+            ))}
+          </Row>
+        </>
       )}
     </Container>
   );
