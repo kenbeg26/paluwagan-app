@@ -127,7 +127,6 @@ export default function PickSchedule() {
 
   return (
     <Container className="my-4 text-center">
-      <h2 className="mb-4">Pick Your Schedule</h2>
 
       {loading && <Spinner animation="border" />}
       {error && <Alert variant="danger">{error}</Alert>}

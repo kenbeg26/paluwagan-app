@@ -15,80 +15,168 @@ body {
 }
 
 /* ======================== */
-/* 💬 Chat Styles - Minimalist Theme */
+/* 💬 Chat Styles - LINE-like Bubble Theme with Tail Arrows */
+
+/* Chat container */
 .chat-container {
   padding: 20px;
+  width: 90%;
   max-width: 500px;
   margin: 40px auto;
   background-color: #FFF5E1;
-  /* Cream */
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   font-size: 0.95rem;
 }
 
+/* Chat title */
 .chat-title {
   text-align: center;
   color: #D4AF37;
-  /* Gold */
   margin-bottom: 15px;
   font-weight: 700;
   font-size: 1.3rem;
   letter-spacing: 0.5px;
 }
 
+/* Messages container */
 .chat-messages {
   border: 1px solid #D2B48C;
-  /* Tan */
   height: 300px;
   overflow-y: auto;
   padding: 12px;
   border-radius: 10px;
   background-color: #FFF9F2;
-  /* Very light cream */
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
-.chat-message {
-  margin-bottom: 10px;
-  padding: 8px 12px;
-  border-radius: 8px;
+/* Message wrapper for alignment */
+.message-wrapper {
+  display: flex;
+  width: 100%;
+}
+
+/* Self messages on right */
+.message-wrapper.self {
+  justify-content: flex-end;
+}
+
+/* Other messages on left */
+.message-wrapper.other {
+  justify-content: flex-start;
+}
+
+/* Align content inside wrapper */
+.message-wrapper.self .message-content {
+  align-items: flex-end;
+}
+
+.message-wrapper.other .message-content {
+  align-items: flex-start;
+}
+
+/* Message content container */
+.message-content {
+  max-width: 75%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Hide username for self messages */
+.message-wrapper.self .chat-username {
+  display: none;
+}
+
+/* Username display for other users */
+.chat-username {
+  font-size: 0.8rem;
+  color: #D4AF37;
+  font-weight: 600;
+  margin-bottom: 3px;
+  padding: 0 8px;
+}
+
+/* Chat bubbles */
+.chat-bubble {
+  position: relative;
+  padding: 10px 14px;
+  border-radius: 18px;
+  line-height: 1.4;
+  word-wrap: break-word;
+  max-width: 100%;
+}
+
+/* Bubble for others (left) */
+.chat-bubble.other {
   background-color: #D2B48C1A;
-  /* Tan with transparency */
-  color: #333333;
-  /* Charcoal text */
+  color: #333;
+  border-top-left-radius: 4px;
 }
 
+/* Bubble for self (right) */
+.chat-bubble.self {
+  background-color: #D4AF37;
+  color: #FFF5E1;
+  border-top-right-radius: 4px;
+}
+
+/* Tail for others */
+.chat-bubble.other::after {
+  content: "";
+  position: absolute;
+  left: -6px;
+  top: 10px;
+  width: 0;
+  height: 0;
+  border-top: 6px solid transparent;
+  border-bottom: 6px solid transparent;
+  border-right: 6px solid #D2B48C1A;
+}
+
+/* Tail for self */
+.chat-bubble.self::after {
+  content: "";
+  position: absolute;
+  right: -6px;
+  top: 10px;
+  width: 0;
+  height: 0;
+  border-top: 6px solid transparent;
+  border-bottom: 6px solid transparent;
+  border-left: 6px solid #D4AF37;
+}
+
+/* Chat input container */
 .chat-input-container {
   margin-top: 15px;
   display: flex;
   gap: 10px;
 }
 
+/* Chat input */
 .chat-input {
   flex: 1;
   padding: 10px;
   border: 1px solid #D2B48C;
-  /* Tan border */
   border-radius: 8px;
   outline: none;
   background-color: #FFF5E1;
-  /* Cream input */
-  color: #333333;
+  color: #333;
   transition: border 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
 }
 
 .chat-input:focus {
   border-color: #D4AF37;
-  /* Gold */
   box-shadow: 0 0 6px rgba(212, 175, 55, 0.3);
 }
 
+/* Send button */
 .chat-send-btn {
   padding: 10px 16px;
   background-color: #D4AF37;
-  /* Gold */
   color: #FFF5E1;
-  /* Cream text */
   border: none;
   border-radius: 8px;
   cursor: pointer;
@@ -98,13 +186,14 @@ body {
 
 .chat-send-btn:hover {
   background-color: #c39b2f;
-  /* Darker gold hover */
 }
 
 .chat-send-btn.disabled {
   background-color: #aaa;
   cursor: not-allowed;
 }
+
+
 
 /* ======================== */
 /* 🏠 Home Page Styles - Minimalist Theme */
@@ -243,4 +332,259 @@ body {
   margin-top: 15px;
   font-size: 1rem;
   color: #555555;
+}
+
+/* Admin Dashboard Container */
+.admin-dashboard-container {
+  max-width: 1000px;
+  margin: 40px auto;
+  padding: 20px;
+  background-color: #FFF5E1;
+  /* cream */
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+/* Headings */
+.admin-dashboard-container h2,
+.admin-dashboard-container h3 {
+  text-align: center;
+  color: #D4AF37;
+  /* gold */
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+/* Buttons */
+.admin-dashboard-container .btn {
+  font-weight: 600;
+  border-radius: 8px;
+  transition: background 0.2s ease-in-out;
+}
+
+.admin-dashboard-container .btn-secondary {
+  background-color: #D2B48C;
+  color: #FFF5E1;
+}
+
+.admin-dashboard-container .btn-secondary:hover {
+  background-color: #c39b2f;
+}
+
+.admin-dashboard-container .btn-warning {
+  background-color: #D4AF37;
+  color: #FFF5E1;
+}
+
+.admin-dashboard-container .btn-warning:hover {
+  background-color: #c39b2f;
+}
+
+.admin-dashboard-container .btn-danger {
+  background-color: #D96C6C;
+  color: #FFF5E1;
+}
+
+.admin-dashboard-container .btn-danger:hover {
+  background-color: #bf5252;
+}
+
+.admin-dashboard-container .btn-success {
+  background-color: #8BC34A;
+  color: #FFF5E1;
+}
+
+.admin-dashboard-container .btn-success:hover {
+  background-color: #6fa636;
+}
+
+/* Table styling */
+.admin-dashboard-container table {
+  background-color: #FFF5E1;
+  border: 1px solid #D2B48C;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.admin-dashboard-container table th {
+  background-color: #D4AF37;
+  color: #FFF5E1;
+  font-weight: 600;
+  text-align: center;
+}
+
+.admin-dashboard-container table td {
+  color: #333333;
+  text-align: center;
+}
+
+.admin-dashboard-container table.table-striped tbody tr:nth-of-type(odd) {
+  background-color: #FFF9F2;
+}
+
+.admin-dashboard-container table.table-hover tbody tr:hover {
+  background-color: #D2B48C1A;
+}
+
+/* Badges */
+.admin-dashboard-container .badge {
+  font-weight: 600;
+}
+
+/* Card styling for mobile */
+.admin-dashboard-container .card {
+  border-radius: 12px;
+  border: 1px solid #D2B48C;
+  background-color: #FFF9F2;
+}
+
+.admin-dashboard-container .card-title {
+  color: #D4AF37;
+  font-weight: 700;
+}
+
+.admin-dashboard-container .card-text {
+  color: #333;
+}
+
+/* Product Catalog Container */
+.product-catalog-container {
+  max-width: 1000px;
+  margin: 50px auto;
+  padding: 20px;
+  background-color: #FFF5E1;
+  /* Cream */
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+/* Heading */
+.product-catalog-container h1 {
+  color: #D4AF37;
+  /* Gold */
+  font-weight: 700;
+  margin-bottom: 25px;
+}
+
+/* Table styling */
+.product-catalog-container table {
+  background-color: #FFF5E1;
+  border: 1px solid #D2B48C;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.product-catalog-container table th {
+  background-color: #D4AF37;
+  color: #FFF5E1;
+  font-weight: 600;
+  text-align: center;
+}
+
+.product-catalog-container table td {
+  text-align: center;
+  color: #333333;
+}
+
+.product-catalog-container table.table-striped tbody tr:nth-of-type(odd) {
+  background-color: #FFF9F2;
+}
+
+.product-catalog-container table.table-hover tbody tr:hover {
+  background-color: #D2B48C1A;
+}
+
+/* Spinner container */
+.product-catalog-container .spinner-container {
+  text-align: center;
+  padding: 50px 0;
+  color: #333333;
+  /* Charcoal */
+}
+
+.product-catalog-container .spinner-container p {
+  margin-top: 15px;
+  font-size: 1rem;
+  color: #555555;
+}
+
+/* Schedule Container */
+.schedule-container {
+  max-width: 1000px;
+  margin: 40px auto;
+  padding: 20px;
+  background-color: #FFF5E1;
+  /* Cream */
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+/* PickSchedule heading */
+.schedule-container h3 {
+  color: #D4AF37;
+  /* Gold */
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+/* Cards */
+.schedule-container .card {
+  border-radius: 12px;
+  border: 1px solid #D2B48C;
+  /* Tan border */
+  background-color: #FFF9F2;
+  /* Slightly lighter cream */
+}
+
+.schedule-container .card-title {
+  color: #D4AF37;
+  font-weight: 700;
+}
+
+.schedule-container .card p {
+  color: #333;
+}
+
+/* Schedule item inside card */
+.schedule-container .card .border {
+  border-color: #D2B48C !important;
+  background-color: #FFF5E1;
+}
+
+/* Badges */
+.schedule-container .badge-success {
+  background-color: #8BC34A;
+  /* green success */
+  color: #FFF5E1;
+}
+
+.schedule-container .badge-warning {
+  background-color: #D2B48C;
+  /* tan warning */
+  color: #333;
+}
+
+.schedule-container .badge-secondary {
+  background-color: #D2B48C1A;
+  /* light tan for neutral */
+  color: #333;
+}
+
+/* Buttons */
+.schedule-container .btn-success {
+  background-color: #D4AF37;
+  /* gold button */
+  color: #FFF5E1;
+  font-weight: 600;
+  border-radius: 8px;
+  transition: background 0.2s ease-in-out;
+}
+
+.schedule-container .btn-success:hover {
+  background-color: #c39b2f;
+}
+
+/* Spinner */
+.schedule-container .text-center .spinner-border {
+  color: #D4AF37;
 }

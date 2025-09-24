@@ -52,7 +52,7 @@ export default function ProductCatalog() {
   }
 
   return (
-    <Container className="py-5">
+    <Container className="product-catalog-container py-5">
       <h1 className="mb-4 text-center">Paluwagan</h1>
 
       <Table striped bordered hover responsive>
@@ -76,5 +76,6 @@ export default function ProductCatalog() {
         </tbody>
       </Table>
     </Container>
+
   );
 }

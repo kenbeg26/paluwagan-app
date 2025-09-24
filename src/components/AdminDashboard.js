@@ -108,7 +108,7 @@ const AdminDashboard = () => {
   };
 
   return (
-    <Container className="py-4" fluid="md">
+    <Container className="admin-dashboard-container py-4" fluid="md">
       <h2 className="text-center mb-4">Admin Dashboard</h2>
 
       {/* --- Product Management --- */}

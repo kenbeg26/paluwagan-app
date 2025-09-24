@@ -5,7 +5,7 @@ const Home = () => {
   return (
     <div className="home-container">
       <div className="hero-section">
-        <h1 className="home-title">💰 Paluwagan Tracker</h1>
+        <h1 className="home-title">💰 Paluwagan Buddy</h1>
         <p className="home-subtitle">
           Smart saving starts here. Build wealth, one step at a time.
         </p>
@@ -24,7 +24,7 @@ const Home = () => {
         {/* Navigation Buttons */}
         <div className="home-links">
           <Link to="/products" className="home-btn">
-            View Products
+            View Bundles
           </Link>
           <Link to="/schedule" className="home-btn">
             View Schedule

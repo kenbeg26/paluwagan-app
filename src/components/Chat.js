@@ -1,4 +1,3 @@
-// Chat.js
 import React, { useEffect, useState, useContext, useRef } from "react";
 import io from "socket.io-client";
 import UserContext from "../context/UserContext";
@@ -10,54 +9,27 @@ export default function Chat() {
   const [message, setMessage] = useState("");
   const messagesEndRef = useRef(null);
 
-  // ✅ Get token from context first, fallback to localStorage
   const token = contextToken || localStorage.getItem("token");
 
-  // Auto-scroll to bottom when messages update
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
   useEffect(scrollToBottom, [messages]);
 
-  // Initialize socket connection + event listeners
   useEffect(() => {
     if (!token) return;
 
-    const newSocket = io("http://localhost:4000", {
-      auth: { token },
-    });
+    const newSocket = io("http://localhost:4000", { auth: { token } });
 
-    newSocket.on("connect", () => {
-      console.log("✅ Connected to server");
-    });
-
-    newSocket.on("connect_error", (err) => {
-      console.error("❌ Connection error:", err.message);
-    });
-
-    newSocket.on("error", (error) => {
-      console.error("⚠️ Socket error:", error);
-      alert(error.message || "An error occurred");
-    });
-
-    // ✅ Receive chat history from backend on connect
-    newSocket.on("chatHistory", (history) => {
-      setMessages(history);
-    });
-
-    // ✅ Listen for new messages from backend
-    newSocket.on("receiveMessage", (msg) => {
-      setMessages((prev) => [...prev, msg]);
-    });
+    newSocket.on("connect", () => console.log("✅ Connected"));
+    newSocket.on("connect_error", (err) => console.error("❌", err.message));
+    newSocket.on("chatHistory", (history) => setMessages(history));
+    newSocket.on("receiveMessage", (msg) => setMessages((prev) => [...prev, msg]));
 
     setSocket(newSocket);
-
-    return () => {
-      newSocket.disconnect();
-    };
+    return () => newSocket.disconnect();
   }, [token]);
 
-  // Send a message
   const sendMessage = () => {
     if (message.trim() && socket) {
       socket.emit("sendMessage", { message });
@@ -69,17 +41,30 @@ export default function Chat() {
     <div className="chat-container">
       <h2 className="chat-title">💵 Paluwagan Hub</h2>
 
-      {/* Messages Box */}
       <div className="chat-messages">
-        {messages.map((msg, index) => (
-          <p key={msg._id || index}>
-            <strong>{msg.user?.codename || "Unknown"} 💰:</strong> {msg.message}
-          </p>
-        ))}
+        {messages.map((msg, index) => {
+          const isSelf = msg.user?._id === user?._id;
+          return (
+            <div
+              key={msg._id || index}
+              className={`message-wrapper ${isSelf ? "self" : "other"}`}
+            >
+              <div className="message-content">
+                {!isSelf && (
+                  <div className="chat-username">
+                    {msg.user?.codename || "Unknown"} 💰
+                  </div>
+                )}
+                <div className={`chat-bubble ${isSelf ? "self" : "other"}`}>
+                  {msg.message}
+                </div>
+              </div>
+            </div>
+          );
+        })}
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input + Send */}
       <div className="chat-input-container">
         <input
           type="text"
