@@ -10,6 +10,11 @@ const Home = () => {
           Smart saving starts here. Build wealth, one step at a time.
         </p>
 
+        {/* GIF Section */}
+        <div className="home-gif">
+          <img src="/Money.gif" alt="Money animation" style={{ maxWidth: '300px', margin: '20px 0' }} />
+        </div>
+
         {/* Quote Section */}
         <blockquote className="home-quote">
           “Do not save what is left after spending, but spend what is left after
