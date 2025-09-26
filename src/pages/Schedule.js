@@ -1,3 +1,4 @@
+// Schedule.js
 import React, { useState, useEffect, useContext } from "react";
 import {
   Card,
@@ -12,208 +13,163 @@ import {
 import axios from "axios";
 import io from "socket.io-client";
 import UserContext from "../context/UserContext";
-import PickSchedule from "../components/PickSchedule"; // ✅ import the component
+import PickSchedule from "../components/PickSchedule";
 
 export default function Schedule() {
+  const { user, token } = useContext(UserContext);
   const [schedules, setSchedules] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const { token, user } = useContext(UserContext);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   const [socket, setSocket] = useState(null);
 
-  // 🔹 Fetch schedules
+  // Fetch schedules
   const fetchSchedules = async () => {
     try {
-      const response = await axios.get(
+      setLoading(true);
+      const res = await axios.get(
         `${process.env.REACT_APP_API_BASE_URL}/schedule/get-all-schedule`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
-      setSchedules(response.data);
+      setSchedules(res.data);
     } catch (err) {
-      setError(err.response?.data?.message || err.message);
+      console.error(err);
+      setError("Failed to load schedules.");
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => {
-    if (!token) return;
-
-    fetchSchedules();
-
-    // 🔹 Initialize Socket.IO connection
-    const newSocket = io("http://localhost:4000", { auth: { token } });
-
-    newSocket.on("connect", () => console.log("✅ Connected to server"));
-    newSocket.on("connect_error", (err) =>
-      console.error("❌ Socket error:", err)
-    );
-
-    setSocket(newSocket);
-    return () => newSocket.disconnect();
-  }, [token]);
-
-  // 🔹 Mark as Paid Handler
+  // Mark as Paid
   const handleMarkAsPaid = async (scheduleId, productId, productName, amount) => {
     try {
-      const response = await axios.patch(
-        `${process.env.REACT_APP_API_BASE_URL}/schedule/paid`,
-        { scheduleId, productId },
+      await axios.post(
+        `${process.env.REACT_APP_API_BASE_URL}/chat/create`,
+        {
+          scheduleId,
+          productId,
+          message: `User ${user.codename} marked ${productName} as PAID (₱${amount})`,
+        },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      const { paidCount } = response.data;
-
-      // Update frontend state for current user's payment
-      setSchedules((prevSchedules) =>
-        prevSchedules.map((schedule) => {
-          if (schedule._id === scheduleId) {
-            return {
-              ...schedule,
-              scheduleOrdered: schedule.scheduleOrdered.map((item) => {
-                if (item.productId._id === productId) {
-                  const payments = [
-                    ...(item.payments?.filter((p) => p.userId !== user.id) || []),
-                    { userId: user.id, status: "paid", paidAt: new Date() },
-                  ];
-                  return { ...item, payments };
-                }
-                return item;
-              }),
-            };
-          }
-          return schedule;
-        })
-      );
-
-      // 🔹 Send group chat notification
-      if (socket) {
-        const formattedAmount = Number(amount).toLocaleString(undefined, {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2,
-        });
-        const message = `${user.codename} paid ₱${formattedAmount} for the month of ${productName}`;
-        socket.emit("sendMessage", { message });
-      }
+      window.location.href = "/chat";
     } catch (err) {
-      console.error("Error updating payment:", err);
-      alert("❌ Failed to update payment.");
+      console.error("Error marking as paid:", err);
     }
   };
 
-  if (loading)
-    return (
-      <div className="text-center mt-5">
-        <Spinner animation="border" variant="primary" />
-      </div>
-    );
+  // WebSocket updates
+  useEffect(() => {
+    fetchSchedules();
 
-  if (error)
+    const newSocket = io(process.env.REACT_APP_API_BASE_URL, {
+      query: { token },
+    });
+    setSocket(newSocket);
+
+    newSocket.on("scheduleUpdated", () => {
+      fetchSchedules();
+    });
+
+    return () => {
+      newSocket.disconnect();
+    };
+  }, [token]);
+
+  if (loading) {
     return (
-      <div className="text-center mt-5 text-danger">
-        Error fetching schedules: {error}
-      </div>
+      <Container className="schedule-container text-center mt-5">
+        <Spinner animation="border" />
+      </Container>
     );
+  }
+
+  if (error) {
+    return (
+      <Container className="schedule-container mt-5">
+        <Alert variant="danger">{error}</Alert>
+      </Container>
+    );
+  }
 
   return (
     <Container className="schedule-container mt-4">
-      {/* 🚨 If user is inactive, block schedules */}
-      {user && !user.isActive ? (
-        <Alert variant="warning" className="text-center">
-          🚫 You're not an active user
-        </Alert>
-      ) : (
-        <>
-          {/* ✅ PickSchedule section */}
-          <div className="mb-4">
-            <h3 className="mb-3 text-center">Paluwagan Spinner</h3>
-            <PickSchedule />
-          </div>
+      <h3 className="mb-4 text-center">Schedules</h3>
+      <PickSchedule onScheduleAdded={fetchSchedules} />
 
-          {/* ✅ Schedules list */}
-          <div className="mb-4">
-            <h3 className="mb-3 text-center">Kaluwag Schedule</h3>
-            <Row xs={1} md={2} lg={3} className="g-4">
-              {schedules.map((schedule) => (
-                <Col key={schedule._id}>
-                  <Card className="h-100">
-                    <Card.Body>
-                      <Card.Title>
-                        {schedule.scheduleOrdered[0]?.productId?.category ||
-                          "Unknown Category"}
-                      </Card.Title>
-                      <p>{schedule.userId?.codename || "Unknown User"}</p>
+      <Row xs={1} md={2} lg={3} className="g-4 mt-3">
+        {schedules.map((schedule) => {
+          const disabled = !schedule.isActive; // ✅ disable if inactive
 
-                      {schedule.scheduleOrdered.map((item) => {
-                        const userPaid = item.payments?.some(
-                          (p) => p.userId === user.id
-                        );
-                        const totalPaidCount = item.payments?.filter(
-                          (p) => p.status === "paid"
-                        ).length;
+          return (
+            <Col key={schedule._id}>
+              <Card className={`h-100 ${disabled ? "opacity-50" : ""}`}>
+                <Card.Body>
+                  <Card.Title>
+                    {schedule.scheduleOrdered[0]?.productId?.category || "Unknown Category"}
+                  </Card.Title>
+                  <p>{schedule.userId?.codename || "Unknown User"}</p>
 
-                        return (
-                          <div key={item._id} className="mb-3 p-2 border rounded">
-                            <h6>Schedule: {item.productId.name}</h6>
-                            <p>
-                              Amount: ₱
-                              {item.productId.amount.toLocaleString()} | Number:{" "}
-                              {item.productId.number}
-                            </p>
+                  {schedule.scheduleOrdered.map((item) => {
+                    const userPaid = item.payments?.some(
+                      (p) => p.userId === user.id
+                    );
+                    const totalPaidCount = item.payments?.filter(
+                      (p) => p.status === "paid"
+                    ).length;
 
-                            <Badge
-                              bg={totalPaidCount > 0 ? "success" : "warning"}
+                    return (
+                      <div key={item._id} className="mb-3 p-2 border rounded">
+                        <h6>Schedule: {item.productId.name}</h6>
+                        <p>
+                          Amount: ₱{item.productId.amount.toLocaleString()} | Number:{" "}
+                          {item.productId.number}
+                        </p>
+
+                        <Badge bg={totalPaidCount > 0 ? "success" : "warning"}>
+                          {totalPaidCount > 0 ? "PAID" : "UNPAID"} (
+                          {totalPaidCount} user{totalPaidCount !== 1 ? "s" : ""} paid)
+                        </Badge>
+
+                        {!userPaid && (
+                          <div className="mt-2">
+                            <Button
+                              variant="success"
+                              size="sm"
+                              disabled={disabled} // ✅ only change
+                              onClick={() =>
+                                handleMarkAsPaid(
+                                  schedule._id,
+                                  item.productId._id,
+                                  item.productId.name,
+                                  item.productId.amount
+                                )
+                              }
                             >
-                              {totalPaidCount > 0 ? "PAID" : "UNPAID"} (
-                              {totalPaidCount} user
-                              {totalPaidCount !== 1 ? "s" : ""} paid)
-                            </Badge>
-
-                            {!userPaid && (
-                              <div className="mt-2">
-                                <Button
-                                  variant="success"
-                                  size="sm"
-                                  onClick={() =>
-                                    handleMarkAsPaid(
-                                      schedule._id,
-                                      item.productId._id,
-                                      item.productId.name,
-                                      item.productId.amount
-                                    )
-                                  }
-                                >
-                                  Mark as Paid
-                                </Button>
-                              </div>
-                            )}
+                              Mark as Paid
+                            </Button>
                           </div>
-                        );
-                      })}
-                    </Card.Body>
-                    <Card.Footer>
-                      <strong>
-                        Total Amount: ₱{schedule.totalAmount.toLocaleString()}
-                      </strong>
-                      <br />
-                      Status:{" "}
-                      <Badge
-                        bg={
-                          schedule.status === "settled" ? "success" : "secondary"
-                        }
-                      >
-                        {schedule.status.toUpperCase()}
-                      </Badge>
-                    </Card.Footer>
-                  </Card>
-                </Col>
-              ))}
-            </Row>
-          </div>
-        </>
-      )}
+                        )}
+                      </div>
+                    );
+                  })}
+                </Card.Body>
+                <Card.Footer>
+                  <strong>Total Amount: ₱{schedule.totalAmount.toLocaleString()}</strong>
+                  <br />
+                  Status:{" "}
+                  <Badge bg={schedule.status === "settled" ? "success" : "secondary"}>
+                    {schedule.status.toUpperCase()}
+                  </Badge>
+                  {!schedule.isActive && (
+                    <div className="mt-2 text-danger fw-bold">Inactive</div>
+                  )}
+                </Card.Footer>
+              </Card>
+            </Col>
+          );
+        })}
+      </Row>
     </Container>
   );
 }

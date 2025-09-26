@@ -57,6 +57,7 @@ const ScheduleManagement = () => {
   };
 
   // Update schedule
+  // ScheduleManagement.js
   const handleSave = async () => {
     try {
       setSaving(true);
@@ -72,23 +73,14 @@ const ScheduleManagement = () => {
             userId: formData.userId,
             status: formData.status,
             isActive: formData.isActive,
-            // Example: update payment status for first payment in first product
-            scheduleOrdered: [
-              {
-                ...editingSchedule.scheduleOrdered[0],
-                payments: [
-                  {
-                    ...editingSchedule.scheduleOrdered[0]?.payments?.[0],
-                    status: formData.paymentStatus,
-                  },
-                ],
-              },
-            ],
+            paymentStatus: formData.paymentStatus, // ✅ simple, clean
           }),
         }
       );
+
       if (!res.ok) throw new Error("Failed to update schedule");
       await res.json();
+
       fetchSchedules();
       setEditingSchedule(null);
     } catch (err) {
@@ -98,13 +90,13 @@ const ScheduleManagement = () => {
     }
   };
 
+
   useEffect(() => {
     fetchSchedules();
   }, []);
 
   return (
     <div className="mt-5">
-      <h3 className="mb-3 text-center">Schedule Management</h3>
 
       {loading ? (
         <div className="text-center">
@@ -115,7 +107,10 @@ const ScheduleManagement = () => {
           <thead className="table-dark">
             <tr>
               <th>#</th>
+              <th>Schedule ID</th>
               <th>User ID</th>
+              <th>User Name</th>
+              <th>Product</th>
               <th>Total Amount</th>
               <th>Status</th>
               <th>Active</th>
@@ -128,13 +123,25 @@ const ScheduleManagement = () => {
               schedules.map((schedule, index) => (
                 <tr key={schedule._id}>
                   <td>{index + 1}</td>
+
+                  {/* ✅ Schedule ID */}
+                  <td>{schedule._id}</td>
+
+                  {/* ✅ User ID */}
                   <td>{schedule.userId?._id || "N/A"}</td>
+
+                  {/* ✅ User Name */}
+                  <td>{schedule.userId?.codename || "N/A"}</td>
+
+                  {/* ✅ Product Name (first product) */}
+                  <td>
+                    {schedule.scheduleOrdered?.[0]?.productId?.name || "N/A"}
+                  </td>
+
                   <td>₱{schedule.totalAmount}</td>
                   <td>
                     <Badge
-                      bg={
-                        schedule.status === "pending" ? "warning" : "success"
-                      }
+                      bg={schedule.status === "pending" ? "warning" : "success"}
                     >
                       {schedule.status}
                     </Badge>
@@ -147,14 +154,12 @@ const ScheduleManagement = () => {
                   <td>
                     <Badge
                       bg={
-                        schedule.scheduleOrdered?.[0]?.payments?.[0]?.status ===
-                          "paid"
+                        schedule.scheduleOrdered?.[0]?.payments?.[0]?.status === "paid"
                           ? "success"
                           : "danger"
                       }
                     >
-                      {schedule.scheduleOrdered?.[0]?.payments?.[0]?.status ||
-                        "unpaid"}
+                      {schedule.scheduleOrdered?.[0]?.payments?.[0]?.status || "unpaid"}
                     </Badge>
                   </td>
                   <td className="text-center">
@@ -170,13 +175,14 @@ const ScheduleManagement = () => {
               ))
             ) : (
               <tr>
-                <td colSpan="7" className="text-center">
+                <td colSpan="10" className="text-center">
                   No schedules found
                 </td>
               </tr>
             )}
           </tbody>
         </Table>
+
       )}
 
       {/* --- Edit Modal --- */}

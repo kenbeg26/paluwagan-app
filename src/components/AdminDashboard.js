@@ -1,3 +1,4 @@
+// AdminDashboard.js
 import React, { useEffect, useState } from "react";
 import {
   Container,
@@ -240,6 +241,7 @@ const AdminDashboard = () => {
           <thead className="table-dark">
             <tr>
               <th>#</th>
+              <th>User ID</th>
               <th>Name</th>
               <th>Codename</th>
               <th>Role</th>
@@ -252,6 +254,7 @@ const AdminDashboard = () => {
               users.map((user, index) => (
                 <tr key={user._id}>
                   <td>{index + 1}</td>
+                  <td style={{ maxWidth: "180px", wordWrap: "break-word" }}>{user._id}</td>
                   <td>{user.name}</td>
                   <td>{user.codename}</td>
                   <td>
@@ -280,7 +283,7 @@ const AdminDashboard = () => {
               ))
             ) : (
               <tr>
-                <td colSpan="6" className="text-center">
+                <td colSpan="7" className="text-center">
                   No users found
                 </td>
               </tr>
