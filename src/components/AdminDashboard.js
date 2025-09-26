@@ -11,6 +11,7 @@ import {
 import EditProduct from "./EditProduct";
 import ArchiveProduct from "./ArchiveProduct";
 import AddProduct from "./AddProduct";
+import ScheduleManagement from "./ScheduleManagement";
 import { useNavigate } from "react-router-dom";
 import { useMediaQuery } from "react-responsive";
 
@@ -112,6 +113,7 @@ const AdminDashboard = () => {
       <h2 className="text-center mb-4">Admin Dashboard</h2>
 
       {/* --- Product Management --- */}
+      <h3 className="text-center mb-4">Product Management</h3>
       <Stack
         direction="horizontal"
         gap={3}
@@ -286,6 +288,9 @@ const AdminDashboard = () => {
           </tbody>
         </Table>
       )}
+
+      <h3 className="mt-5 mb-3 text-center">Schedule Management</h3>
+      <ScheduleManagement />
 
       {/* --- Modals --- */}
       <EditProduct
