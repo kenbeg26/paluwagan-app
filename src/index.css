@@ -1,15 +1,16 @@
-@import url('https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,100..900;1,100..900&family=Exo:ital,wght@0,100..900;1,100..900&family=Jost:ital,wght@0,100..900;1,100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,100..900;1,100..900&family=Exo:ital,wght@0,100..900;1,100..900&family=Jost:ital,wght@0,100..900;1,100..900&family=SUSE+Mono:ital,wght@0,100..800;1,100..800&display=swap');
 
 /* Universal Reset */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  font-family: 'SUSE Mono', 'Exo 2', 'Exo', 'Jost', sans-serif;
 }
 
 /* Universal Font & Background */
 body {
-  font-family: 'Exo 2', 'Exo', 'Jost', sans-serif;
+  font-family: 'SUSE Mono', 'Exo 2', 'Exo', 'Jost', sans-serif;
   background-color: #FFF5E1;
   /* Cream background */
   color: #333333;

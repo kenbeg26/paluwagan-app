@@ -1,25 +1,53 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import axios from "axios";
+
 
 const Home = () => {
+  const [quote, setQuote] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchRandomQuote = async () => {
+      try {
+        const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/quotes/random`);
+        setQuote(response.data); // assuming response.data contains { text, author }
+      } catch (err) {
+        console.error("Error fetching quote:", err);
+        setError("Failed to load quote.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRandomQuote();
+  }, []);
+
   return (
     <div className="home-container">
       <div className="hero-section">
         <h1 className="home-title">💰 Paluwagan Buddy</h1>
-        <p className="home-subtitle">
-          Smart saving starts here. Build wealth, one step at a time.
-        </p>
-
-        {/* GIF Section */}
-        <div className="home-gif">
-          <img src="/Money.gif" alt="Money animation" style={{ maxWidth: '300px', margin: '20px 0' }} />
-        </div>
 
         {/* Quote Section */}
         <blockquote className="home-quote">
-          “Do not save what is left after spending, but spend what is left after
-          saving.” <br /> <span>– Warren Buffett</span>
+          {loading && "Loading quote..."}
+          {error && error}
+          {!loading && !error && quote && (
+            <>
+              “{quote.text}” <br /> <span>– {quote.author}</span>
+            </>
+          )}
         </blockquote>
+
+        {/* GIF Section */}
+        <div className="home-gif">
+          <img
+            src="/Money.gif"
+            alt="Money animation"
+            style={{ maxWidth: "300px", margin: "20px 0" }}
+          />
+        </div>
 
         {/* Navigation Buttons */}
         <div className="home-links">
