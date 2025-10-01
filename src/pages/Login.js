@@ -92,13 +92,9 @@ export default function Login() {
   if (user.id !== null) {
     return <Navigate to="/" />;
   }
-
   return (
-    <div
-      className="login-container"
-      style={{ maxWidth: "400px", margin: "0 auto", padding: "20px" }}
-    >
-      <h1 className="text-center my-5">Log In</h1>
+    <div className="auth-container">
+      <h1>Log In</h1>
       <Form onSubmit={authenticate}>
         <Form.Group className="mb-3">
           <Form.Label>Codename:</Form.Label>
@@ -122,8 +118,6 @@ export default function Login() {
           />
         </Form.Group>
 
-        <hr className="mb-4" />
-
         <Button
           variant={isActive ? "primary" : "secondary"}
           type="submit"
@@ -134,9 +128,8 @@ export default function Login() {
           Submit
         </Button>
 
-        <p className="text-center mt-3">
-          Don't have an account yet? <Link to="/register">Click here</Link> to
-          register.
+        <p>
+          Don’t have an account yet? <Link to="/register">Click here</Link> to register.
         </p>
       </Form>
     </div>

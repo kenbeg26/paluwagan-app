@@ -93,22 +93,21 @@ export default function Register() {
   }
 
   return (
-    <>
+    <div className="auth-container">
+      <h1>Sign Up & Get Started</h1>
       <Form onSubmit={registerUser}>
-        <h1 className="my-5 text-center">Sign Up & Get Started</h1>
-
-        <Form.Group>
-          <Form.Label>Comple Name</Form.Label>
+        <Form.Group className="mb-3">
+          <Form.Label>Complete Name</Form.Label>
           <Form.Control
             type="text"
-            placeholder="Enter Comple Name"
+            placeholder="Enter Complete Name"
             required
             value={name}
             onChange={e => setName(e.target.value)}
           />
         </Form.Group>
 
-        <Form.Group>
+        <Form.Group className="mb-3">
           <Form.Label>Code Name</Form.Label>
           <Form.Control
             type="text"
@@ -119,7 +118,7 @@ export default function Register() {
           />
         </Form.Group>
 
-        <Form.Group>
+        <Form.Group className="mb-4">
           <Form.Label>Password</Form.Label>
           <Form.Control
             type="password"
@@ -135,29 +134,16 @@ export default function Register() {
           variant={isActive ? "primary" : "secondary"}
           type="submit"
           disabled={!isActive || isSubmitting}
+          className="w-100"
         >
-          {isSubmitting ? (
-            <>
-              <Spinner
-                as="span"
-                animation="border"
-                size="sm"
-                role="status"
-                aria-hidden="true"
-                className="me-2"
-              />
-              Registering...
-            </>
-          ) : 'Submit'}
-
+          {isSubmitting ? "Registering..." : "Submit"}
         </Button>
-
       </Form>
 
-      <p className="mt-3 text-center">
+      <p>
         Already have an account? <Link to="/login">Click here</Link> to log in.
       </p>
-    </>
-  )
+    </div>
+  );
 
 }

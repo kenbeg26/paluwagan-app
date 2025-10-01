@@ -661,3 +661,42 @@ body {
 .schedule-container .text-center .spinner-border {
   color: #D4AF37;
 }
+
+/* ======================== */
+/* 🔑 Auth Pages (Login & Register) */
+.auth-container {
+  max-width: 500px;
+  margin: 50px auto;
+  padding: 30px;
+  background-color: #FFF5E1;
+  /* Cream */
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.auth-container h1 {
+  text-align: center;
+  color: #D4AF37;
+  /* Gold */
+  font-weight: 700;
+  margin-bottom: 25px;
+}
+
+.auth-container .btn-primary {
+  background-color: #D4AF37;
+  border: none;
+  color: #FFF5E1;
+  font-weight: 600;
+  border-radius: 8px;
+  transition: background 0.2s ease-in-out;
+}
+
+.auth-container .btn-primary:hover {
+  background-color: #c39b2f;
+}
+
+.auth-container p {
+  text-align: center;
+  margin-top: 20px;
+  color: #333;
+}
