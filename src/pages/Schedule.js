@@ -40,23 +40,30 @@ export default function Schedule() {
   };
 
   // Mark as Paid
+  // Schedule.js
+
   const handleMarkAsPaid = async (scheduleId, productId, productName, amount) => {
     try {
-      await axios.post(
-        `${process.env.REACT_APP_API_BASE_URL}/chat/create`,
-        {
-          scheduleId,
-          productId,
-          message: `User ${user.codename} marked ${productName} as PAID (₱${amount})`,
-        },
+      const res = await axios.post(
+        `${process.env.REACT_APP_API_BASE_URL}/schedule/paid`,
+        { scheduleId, productId },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      window.location.href = "/chat";
+      // ✅ backend already generates chatMessage + socket emit
+      console.log("Payment success:", res.data);
+
+      // Optionally show feedback
+      alert(res.data.chatMessage);
+
+      // Refresh schedule list after marking as paid
+      fetchSchedules();
+
     } catch (err) {
       console.error("Error marking as paid:", err);
     }
   };
+
 
   // WebSocket updates
   useEffect(() => {
