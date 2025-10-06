@@ -1,4 +1,3 @@
-// Schedule.js
 import React, { useState, useEffect, useContext } from "react";
 import {
   Card,
@@ -16,11 +15,14 @@ import UserContext from "../context/UserContext";
 import PickSchedule from "../components/PickSchedule";
 
 export default function Schedule() {
-  const { user, token } = useContext(UserContext);
+  const { user } = useContext(UserContext);
   const [schedules, setSchedules] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [socket, setSocket] = useState(null);
+
+  // ✅ Always read fresh token from localStorage
+  const token = localStorage.getItem("token");
 
   // Fetch schedules
   const fetchSchedules = async () => {
@@ -32,7 +34,7 @@ export default function Schedule() {
       );
       setSchedules(res.data);
     } catch (err) {
-      console.error(err);
+      console.error("Fetch schedules error:", err);
       setError("Failed to load schedules.");
     } finally {
       setLoading(false);
@@ -40,9 +42,7 @@ export default function Schedule() {
   };
 
   // Mark as Paid
-  // Schedule.js
-
-  const handleMarkAsPaid = async (scheduleId, productId, productName, amount) => {
+  const handleMarkAsPaid = async (scheduleId, productId) => {
     try {
       const res = await axios.post(
         `${process.env.REACT_APP_API_BASE_URL}/schedule/paid`,
@@ -50,27 +50,25 @@ export default function Schedule() {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      // ✅ backend already generates chatMessage + socket emit
       console.log("Payment success:", res.data);
 
-      // Optionally show feedback
       alert(res.data.chatMessage);
 
-      // Refresh schedule list after marking as paid
       fetchSchedules();
-
     } catch (err) {
       console.error("Error marking as paid:", err);
+      if (err.response?.status === 401) {
+        alert("Your session expired. Please log in again.");
+      }
     }
   };
-
 
   // WebSocket updates
   useEffect(() => {
     fetchSchedules();
 
     const newSocket = io(process.env.REACT_APP_API_BASE_URL, {
-      query: { token },
+      query: { token }, // ✅ send token with socket
     });
     setSocket(newSocket);
 
@@ -106,7 +104,7 @@ export default function Schedule() {
 
       <Row xs={1} md={2} lg={3} className="g-4 mt-3">
         {schedules.map((schedule) => {
-          const disabled = !schedule.isActive; // ✅ disable if inactive
+          const disabled = !schedule.isActive;
 
           return (
             <Col key={schedule._id}>
@@ -143,14 +141,9 @@ export default function Schedule() {
                             <Button
                               variant="success"
                               size="sm"
-                              disabled={disabled} // ✅ only change
+                              disabled={disabled}
                               onClick={() =>
-                                handleMarkAsPaid(
-                                  schedule._id,
-                                  item.productId._id,
-                                  item.productId.name,
-                                  item.productId.amount
-                                )
+                                handleMarkAsPaid(schedule._id, item.productId._id)
                               }
                             >
                               Mark as Paid
