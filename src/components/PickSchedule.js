@@ -73,9 +73,14 @@ export default function PickSchedule() {
       const randomSpins = Math.floor(Math.random() * 5) + 5;
       const randomIndex = Math.floor(Math.random() * products.length);
       setSelectedIndex(randomIndex);
-      const anglePerSlice = 360 / products.length;
 
-      const finalAngle = 360 - randomIndex * anglePerSlice - anglePerSlice / 2 + 90;
+      const anglePerSlice = 360 / products.length;
+      const sliceCenterAngle = randomIndex * anglePerSlice + anglePerSlice / 2;
+
+      // ✅ FIXED: Align selected slice with BOTTOM pointer (180° position)
+      // The bottom is at 180°, so we need to rotate the slice center to this position
+      const finalAngle = 180 - sliceCenterAngle;
+
       const newRotation = rotation + randomSpins * 360 + finalAngle;
       setRotation(newRotation);
 
@@ -127,13 +132,29 @@ export default function PickSchedule() {
 
   return (
     <Container className="my-4 text-center">
-
       {loading && <Spinner animation="border" />}
       {error && <Alert variant="danger">{error}</Alert>}
 
       {/* Wheel container */}
       <div className="relative mx-auto my-4" style={{ width: 320, height: 320 }}>
         <div style={{ position: "relative", width: "300px", height: "300px", margin: "0 auto" }}>
+
+          {/* Pointer at BOTTOM center, pointing upward */}
+          <div
+            style={{
+              position: "absolute",
+              bottom: 0,
+              left: "50%",
+              transform: "translateX(-50%)",
+              width: 0,
+              height: 0,
+              borderLeft: "15px solid transparent",
+              borderRight: "15px solid transparent",
+              borderBottom: "25px solid red",
+              zIndex: 20,
+            }}
+          />
+
           <motion.div
             animate={{ rotate: rotation }}
             transition={{ duration: 3.5, ease: "easeOut" }}
@@ -188,12 +209,12 @@ export default function PickSchedule() {
                 fontWeight="bold"
                 textAnchor="middle"
               >
-                {user && !user.isActive ? "🚫 User Not Active" : "Spin"}
+                {user && !user.isActive ? "🚫" : "Spin"}
               </text>
             </svg>
           </motion.div>
 
-          {/* Overlay messages */}
+          {/* Overlay message if user already has schedule */}
           {hasSchedule && (
             <div
               style={{
@@ -213,28 +234,10 @@ export default function PickSchedule() {
               📅 You already picked a schedule
             </div>
           )}
-
-          {selectedIndex !== null && (
-            <div
-              style={{
-                position: "absolute",
-                top: "50%",
-                left: "50%",
-                transform: `translate(-50%, -50%) rotate(${selectedIndex * (360 / products.length)}deg)`,
-                transformOrigin: "bottom center",
-                width: 0,
-                height: 0,
-                borderLeft: "15px solid transparent",
-                borderRight: "15px solid transparent",
-                borderBottom: "25px solid red",
-                zIndex: 20,
-              }}
-            />
-          )}
         </div>
       </div>
 
-      {/* Spin button only if user is active */}
+      {/* Spin button */}
       {!chosenProduct && !hasSchedule && user?.isActive && (
         <Button
           className="spin-wheel-btn"
@@ -243,7 +246,6 @@ export default function PickSchedule() {
         >
           {spinning ? "Spinning..." : "Spin the Wheel"}
         </Button>
-
       )}
 
       {chosenProduct && (
