@@ -700,3 +700,21 @@ body {
   margin-top: 20px;
   color: #333;
 }
+
+/*spinner button*/
+.spin-wheel-btn {
+  background-color: #D4AF37 !important;
+  /* Gold */
+  color: #FFF5E1 !important;
+  /* Cream text */
+  font-weight: 600;
+  border-radius: 8px;
+  padding: 10px 20px;
+  transition: background 0.2s ease-in-out;
+  border: none !important;
+}
+
+.spin-wheel-btn:hover {
+  background-color: #c39b2f !important;
+  /* Darker gold on hover */
+}

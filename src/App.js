@@ -11,7 +11,6 @@ import AdminDashboard from './components/AdminDashboard';
 import ProductCatalog from './pages/ProductCatalog';
 import Schedule from './pages/Schedule';
 import Chat from './components/Chat';
-import NotAuthorized from './pages/NotAuthorized';
 
 function App() {
   const [user, setUser] = useState({
@@ -50,17 +49,7 @@ function App() {
       .catch(err => console.error("Error fetching user details:", err));
   }, []);
 
-  // 🔒 Protected Route for Active Users
-  const ActiveRoute = ({ element }) => {
-    return user.isActive === false ? <Navigate to="/not-authorized" /> : element;
-  };
 
-  // 🔒 Protected Route for Admins Only
-  const AdminRoute = ({ element }) => {
-    if (user.isActive === false) return <Navigate to="/not-authorized" />;
-    if (!user.isAdmin) return <Navigate to="/" />;
-    return element;
-  };
 
   return (
     <UserProvider value={{ user, setUser, unsetUser }}>
@@ -72,13 +61,11 @@ function App() {
             <Route path="/register" element={<Register />} />
             <Route path="/login" element={<Login />} />
             <Route path="/logout" element={<Logout />} />
-            <Route path="/not-authorized" element={<NotAuthorized />} />
 
-            {/* 🔒 Protected Routes */}
-            <Route path="/adminDashboard" element={<AdminRoute element={<AdminDashboard />} />} />
-            <Route path="/products" element={<ActiveRoute element={<ProductCatalog />} />} />
-            <Route path="/schedule" element={<ActiveRoute element={<Schedule />} />} />
-            <Route path="/chat" element={<ActiveRoute element={<Chat />} />} />
+            <Route path="/adminDashboard" element={<AdminDashboard />} />
+            <Route path="/products" element={<ProductCatalog />} />
+            <Route path="/schedule" element={<Schedule />} />
+            <Route path="/chat" element={<Chat />} />
           </Routes>
         </Container>
       </Router>

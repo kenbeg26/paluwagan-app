@@ -236,9 +236,14 @@ export default function PickSchedule() {
 
       {/* Spin button only if user is active */}
       {!chosenProduct && !hasSchedule && user?.isActive && (
-        <Button onClick={handlePickSchedule} disabled={spinning || products.length === 0}>
+        <Button
+          className="spin-wheel-btn"
+          onClick={handlePickSchedule}
+          disabled={spinning || products.length === 0}
+        >
           {spinning ? "Spinning..." : "Spin the Wheel"}
         </Button>
+
       )}
 
       {chosenProduct && (

@@ -15,17 +15,21 @@ import UserContext from "../context/UserContext";
 import PickSchedule from "../components/PickSchedule";
 
 export default function Schedule() {
-  const { user } = useContext(UserContext);
+  const { user, token: contextToken } = useContext(UserContext);
   const [schedules, setSchedules] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [socket, setSocket] = useState(null);
 
-  // ✅ Always read fresh token from localStorage
-  const token = localStorage.getItem("token");
+  const token = contextToken || localStorage.getItem("token");
 
   // Fetch schedules
   const fetchSchedules = async () => {
+    if (!token) {
+      setError("No authentication token found. Please log in again.");
+      return;
+    }
+
     try {
       setLoading(true);
       const res = await axios.get(
@@ -51,37 +55,45 @@ export default function Schedule() {
       );
 
       console.log("Payment success:", res.data);
+      alert(res.data.chatMessage || "Marked as paid successfully!");
 
-      alert(res.data.chatMessage);
-
-      fetchSchedules();
+      fetchSchedules(); // Refresh schedules immediately
     } catch (err) {
       console.error("Error marking as paid:", err);
       if (err.response?.status === 401) {
         alert("Your session expired. Please log in again.");
+      } else {
+        alert("Failed to mark as paid. Please try again.");
       }
     }
   };
 
   // WebSocket updates
   useEffect(() => {
+    if (!token) return;
+
     fetchSchedules();
 
     const newSocket = io(process.env.REACT_APP_API_BASE_URL, {
-      query: { token }, // ✅ send token with socket
+      auth: { token },
     });
-    setSocket(newSocket);
+
+    newSocket.on("connect", () => console.log("✅ Connected to schedule socket"));
+    newSocket.on("connect_error", (err) =>
+      console.error("❌ Socket error:", err.message)
+    );
 
     newSocket.on("scheduleUpdated", () => {
       fetchSchedules();
     });
 
-    return () => {
-      newSocket.disconnect();
-    };
+    setSocket(newSocket);
+
+    return () => newSocket.disconnect();
   }, [token]);
 
-  if (loading) {
+  // Conditional render spinner if user not loaded or loading schedules
+  if (!user || loading) {
     return (
       <Container className="schedule-container text-center mt-5">
         <Spinner animation="border" />
@@ -116,9 +128,13 @@ export default function Schedule() {
                   <p>{schedule.userId?.codename || "Unknown User"}</p>
 
                   {schedule.scheduleOrdered.map((item) => {
-                    const userPaid = item.payments?.some(
-                      (p) => p.userId === user.id
+                    // ✅ Safe comparison
+                    console.log("userPaid check:", user?._id, item.payments.map(p => p.userId));
+                    const userIdStr = user?._id || user?.id; // fallback if context has id
+                    const userPaid = !!(
+                      item.payments?.some(p => String(p.userId) === String(userIdStr) && p.status === "paid")
                     );
+
                     const totalPaidCount = item.payments?.filter(
                       (p) => p.status === "paid"
                     ).length;
@@ -136,20 +152,17 @@ export default function Schedule() {
                           {totalPaidCount} user{totalPaidCount !== 1 ? "s" : ""} paid)
                         </Badge>
 
-                        {!userPaid && (
-                          <div className="mt-2">
-                            <Button
-                              variant="success"
-                              size="sm"
-                              disabled={disabled}
-                              onClick={() =>
-                                handleMarkAsPaid(schedule._id, item.productId._id)
-                              }
-                            >
-                              Mark as Paid
-                            </Button>
-                          </div>
-                        )}
+                        <div className="mt-2">
+                          <Button
+                            variant={userPaid ? "secondary" : "success"}
+                            size="sm"
+                            disabled={disabled || userPaid}
+                            onClick={() => handleMarkAsPaid(schedule._id, item.productId._id)}
+                          >
+                            {userPaid ? "Already Paid" : "Mark as Paid"}
+                          </Button>
+
+                        </div>
                       </div>
                     );
                   })}
