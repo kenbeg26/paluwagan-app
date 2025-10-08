@@ -11,6 +11,8 @@ import AdminDashboard from './components/AdminDashboard';
 import ProductCatalog from './pages/ProductCatalog';
 import Schedule from './pages/Schedule';
 import Chat from './components/Chat';
+import NotAuthorized from './pages/NotAuthorized';
+
 
 function App() {
   const [user, setUser] = useState({
@@ -23,6 +25,22 @@ function App() {
     localStorage.clear();
     setUser({ id: null, isAdmin: null, isActive: null });
   }
+
+  function ProtectedRoute({ element, user }) {
+    if (!user.id) {
+      // If not logged in, redirect to login
+      return <Navigate to="/login" />;
+    }
+
+    if (user.isActive === false) {
+      // If user is inactive, redirect to NotAuthorized page
+      return <Navigate to="/not-authorized" />;
+    }
+
+    // Otherwise, allow access
+    return element;
+  }
+
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -61,12 +79,24 @@ function App() {
             <Route path="/register" element={<Register />} />
             <Route path="/login" element={<Login />} />
             <Route path="/logout" element={<Logout />} />
+            <Route path="/not-authorized" element={<NotAuthorized />} />
 
+            {/* Admin-only route (optional) */}
             <Route path="/adminDashboard" element={<AdminDashboard />} />
+
             <Route path="/products" element={<ProductCatalog />} />
-            <Route path="/schedule" element={<Schedule />} />
-            <Route path="/chat" element={<Chat />} />
+
+            {/* Protect these routes */}
+            <Route
+              path="/schedule"
+              element={<ProtectedRoute element={<Schedule />} user={user} />}
+            />
+            <Route
+              path="/chat"
+              element={<ProtectedRoute element={<Chat />} user={user} />}
+            />
           </Routes>
+
         </Container>
       </Router>
     </UserProvider>

@@ -718,3 +718,20 @@ body {
   background-color: #c39b2f !important;
   /* Darker gold on hover */
 }
+
+/* Gold link for auth pages */
+.auth-container p a {
+  color: #D4AF37;
+  /* Gold */
+  font-weight: 600;
+  /* Optional: make it bold */
+  text-decoration: none;
+  /* Remove underline if desired */
+}
+
+.auth-container p a:hover {
+  color: #c39b2f;
+  /* Darker gold on hover */
+  text-decoration: underline;
+  /* Optional: underline on hover */
+}

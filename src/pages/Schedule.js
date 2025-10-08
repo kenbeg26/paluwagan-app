@@ -11,6 +11,7 @@ import {
 } from "react-bootstrap";
 import axios from "axios";
 import io from "socket.io-client";
+import { useNavigate } from "react-router-dom";
 import UserContext from "../context/UserContext";
 import PickSchedule from "../components/PickSchedule";
 
@@ -20,6 +21,7 @@ export default function Schedule() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [socket, setSocket] = useState(null);
+  const navigate = useNavigate();
 
   const token = contextToken || localStorage.getItem("token");
 
@@ -45,25 +47,23 @@ export default function Schedule() {
     }
   };
 
-  // Mark as Paid
+  // Mark as Paid → Redirect to Chat
   const handleMarkAsPaid = async (scheduleId, productId) => {
     try {
-      const res = await axios.post(
+      await axios.post(
         `${process.env.REACT_APP_API_BASE_URL}/schedule/paid`,
         { scheduleId, productId },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      console.log("Payment success:", res.data);
-      alert(res.data.chatMessage || "Marked as paid successfully!");
-
-      fetchSchedules(); // Refresh schedules immediately
+      fetchSchedules(); // Refresh schedules
+      navigate("/chat"); // ✅ Redirect to Chat page
     } catch (err) {
       console.error("Error marking as paid:", err);
       if (err.response?.status === 401) {
-        alert("Your session expired. Please log in again.");
+        setError("Your session expired. Please log in again.");
       } else {
-        alert("Failed to mark as paid. Please try again.");
+        setError("Failed to mark as paid. Please try again.");
       }
     }
   };
@@ -78,21 +78,19 @@ export default function Schedule() {
       auth: { token },
     });
 
-    newSocket.on("connect", () => console.log("✅ Connected to schedule socket"));
+    newSocket.on("connect", () =>
+      console.log("✅ Connected to schedule socket")
+    );
     newSocket.on("connect_error", (err) =>
       console.error("❌ Socket error:", err.message)
     );
 
-    newSocket.on("scheduleUpdated", () => {
-      fetchSchedules();
-    });
+    newSocket.on("scheduleUpdated", fetchSchedules);
 
     setSocket(newSocket);
-
     return () => newSocket.disconnect();
   }, [token]);
 
-  // Conditional render spinner if user not loaded or loading schedules
   if (!user || loading) {
     return (
       <Container className="schedule-container text-center mt-5">
@@ -123,16 +121,17 @@ export default function Schedule() {
               <Card className={`h-100 ${disabled ? "opacity-50" : ""}`}>
                 <Card.Body>
                   <Card.Title>
-                    {schedule.scheduleOrdered[0]?.productId?.category || "Unknown Category"}
+                    {schedule.scheduleOrdered[0]?.productId?.category ||
+                      "Unknown Category"}
                   </Card.Title>
                   <p>{schedule.userId?.codename || "Unknown User"}</p>
 
                   {schedule.scheduleOrdered.map((item) => {
-                    // ✅ Safe comparison
-                    console.log("userPaid check:", user?._id, item.payments.map(p => p.userId));
-                    const userIdStr = user?._id || user?.id; // fallback if context has id
-                    const userPaid = !!(
-                      item.payments?.some(p => String(p.userId) === String(userIdStr) && p.status === "paid")
+                    const userIdStr = user?._id || user?.id;
+                    const userPaid = item.payments?.some(
+                      (p) =>
+                        String(p.userId) === String(userIdStr) &&
+                        p.status === "paid"
                     );
 
                     const totalPaidCount = item.payments?.filter(
@@ -143,13 +142,14 @@ export default function Schedule() {
                       <div key={item._id} className="mb-3 p-2 border rounded">
                         <h6>Schedule: {item.productId.name}</h6>
                         <p>
-                          Amount: ₱{item.productId.amount.toLocaleString()} | Number:{" "}
-                          {item.productId.number}
+                          Amount: ₱{item.productId.amount.toLocaleString()} |
+                          Number: {item.productId.number}
                         </p>
 
                         <Badge bg={totalPaidCount > 0 ? "success" : "warning"}>
                           {totalPaidCount > 0 ? "PAID" : "UNPAID"} (
-                          {totalPaidCount} user{totalPaidCount !== 1 ? "s" : ""} paid)
+                          {totalPaidCount} user
+                          {totalPaidCount !== 1 ? "s" : ""} paid)
                         </Badge>
 
                         <div className="mt-2">
@@ -157,21 +157,28 @@ export default function Schedule() {
                             variant={userPaid ? "secondary" : "success"}
                             size="sm"
                             disabled={disabled || userPaid}
-                            onClick={() => handleMarkAsPaid(schedule._id, item.productId._id)}
+                            onClick={() =>
+                              handleMarkAsPaid(schedule._id, item.productId._id)
+                            }
                           >
                             {userPaid ? "Already Paid" : "Mark as Paid"}
                           </Button>
-
                         </div>
                       </div>
                     );
                   })}
                 </Card.Body>
                 <Card.Footer>
-                  <strong>Total Amount: ₱{schedule.totalAmount.toLocaleString()}</strong>
+                  <strong>
+                    Total Amount: ₱{schedule.totalAmount.toLocaleString()}
+                  </strong>
                   <br />
                   Status:{" "}
-                  <Badge bg={schedule.status === "settled" ? "success" : "secondary"}>
+                  <Badge
+                    bg={
+                      schedule.status === "settled" ? "success" : "secondary"
+                    }
+                  >
                     {schedule.status.toUpperCase()}
                   </Badge>
                   {!schedule.isActive && (
