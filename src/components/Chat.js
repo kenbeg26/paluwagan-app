@@ -19,10 +19,13 @@ export default function Chat() {
   useEffect(scrollToBottom, [messages]);
 
   // Initialize socket
+  // Initialize socket
   useEffect(() => {
     if (!token) return;
 
-    const newSocket = io("http://localhost:4000", { auth: { token } });
+    const socketUrl = process.env.REACT_APP_API_BASE_URL;
+
+    const newSocket = io(socketUrl, { auth: { token } });
 
     newSocket.on("connect", () => console.log("✅ Connected"));
     newSocket.on("connect_error", (err) => console.error("❌", err.message));
@@ -45,6 +48,7 @@ export default function Chat() {
 
     return () => newSocket.disconnect();
   }, [token, user?.codename]);
+
 
   // Send message
   const sendMessage = () => {

@@ -8,6 +8,7 @@ import {
   Badge,
   Button,
   Alert,
+  Modal,
 } from "react-bootstrap";
 import axios from "axios";
 import io from "socket.io-client";
@@ -21,6 +22,9 @@ export default function Schedule() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [socket, setSocket] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+  const [selectedSchedule, setSelectedSchedule] = useState(null);
+  const [selectedProduct, setSelectedProduct] = useState(null);
   const navigate = useNavigate();
 
   const token = contextToken || localStorage.getItem("token");
@@ -48,16 +52,19 @@ export default function Schedule() {
   };
 
   // Mark as Paid → Redirect to Chat
-  const handleMarkAsPaid = async (scheduleId, productId) => {
+  const handleMarkAsPaid = async () => {
+    if (!selectedSchedule || !selectedProduct) return;
+
     try {
       await axios.post(
         `${process.env.REACT_APP_API_BASE_URL}/schedule/paid`,
-        { scheduleId, productId },
+        { scheduleId: selectedSchedule, productId: selectedProduct },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
       fetchSchedules(); // Refresh schedules
-      navigate("/chat"); // ✅ Redirect to Chat page
+      setShowModal(false); // Close modal
+      navigate("/chat"); // Redirect to Chat page
     } catch (err) {
       console.error("Error marking as paid:", err);
       if (err.response?.status === 401) {
@@ -66,6 +73,13 @@ export default function Schedule() {
         setError("Failed to mark as paid. Please try again.");
       }
     }
+  };
+
+  // Show modal on button click
+  const confirmMarkAsPaid = (scheduleId, productId) => {
+    setSelectedSchedule(scheduleId);
+    setSelectedProduct(productId);
+    setShowModal(true);
   };
 
   // WebSocket updates
@@ -158,7 +172,7 @@ export default function Schedule() {
                             size="sm"
                             disabled={disabled || userPaid}
                             onClick={() =>
-                              handleMarkAsPaid(schedule._id, item.productId._id)
+                              confirmMarkAsPaid(schedule._id, item.productId._id)
                             }
                           >
                             {userPaid ? "Already Paid" : "Mark as Paid"}
@@ -190,6 +204,22 @@ export default function Schedule() {
           );
         })}
       </Row>
+
+      {/* Confirmation Modal */}
+      <Modal show={showModal} onHide={() => setShowModal(false)} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>Confirm Payment</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>Are you sure you want to mark this schedule as paid?</Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowModal(false)}>
+            Cancel
+          </Button>
+          <Button variant="success" onClick={handleMarkAsPaid}>
+            Yes, Mark as Paid
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </Container>
   );
 }
