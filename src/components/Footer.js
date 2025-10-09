@@ -43,7 +43,7 @@ export default function Footer() {
             />
           </a>
           <a
-            href="https://github.com"
+            href="https://github.com/kenbeg26"
             target="_blank"
             rel="noopener noreferrer"
             aria-label="GitHub"

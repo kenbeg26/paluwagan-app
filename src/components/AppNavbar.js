@@ -2,6 +2,7 @@ import { useContext } from "react";
 import { NavLink } from "react-router-dom";
 import { Container, Navbar, Nav } from "react-bootstrap";
 import UserContext from "../context/UserContext";
+import { ChatDots } from "react-bootstrap-icons";
 import "../index.css";
 
 export default function AppNavbar() {
@@ -17,7 +18,9 @@ export default function AppNavbar() {
           💰 Paluwagan Tracker
         </Navbar.Brand>
 
+        {/* Toggle button for small screens */}
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
+
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="ms-auto">
             <Nav.Link as={NavLink} to="/" end>
@@ -44,14 +47,9 @@ export default function AppNavbar() {
             )}
 
             {isLoggedIn && isActive && (
-              <>
-                <Nav.Link as={NavLink} to="/schedule">
-                  Schedule
-                </Nav.Link>
-                <Nav.Link as={NavLink} to="/chat">
-                  Chat
-                </Nav.Link>
-              </>
+              <Nav.Link as={NavLink} to="/schedule">
+                Schedule
+              </Nav.Link>
             )}
 
             {isLoggedIn ? (
@@ -70,6 +68,24 @@ export default function AppNavbar() {
             )}
           </Nav>
         </Navbar.Collapse>
+
+        {/* Chat icon always visible separately */}
+        {isLoggedIn && isActive && (
+          <Nav className="chat-floating-btn d-lg-none">
+            <Nav.Link as={NavLink} to="/chat" title="Chat">
+              <ChatDots size={28} />
+            </Nav.Link>
+          </Nav>
+        )}
+
+        {/* Large screen inline chat icon */}
+        {isLoggedIn && isActive && (
+          <Nav className="ms-auto d-none d-lg-flex align-items-center me-2">
+            <Nav.Link as={NavLink} to="/chat" title="Chat">
+              <ChatDots size={24} />
+            </Nav.Link>
+          </Nav>
+        )}
       </Container>
     </Navbar>
   );

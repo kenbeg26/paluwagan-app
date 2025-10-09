@@ -866,3 +866,20 @@ body,
   text-align: center;
   padding: 15px 0;
 }
+
+.chat-floating-btn {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 1050;
+}
+
+@media (min-width: 992px) {
+
+  /* Remove floating effect on large screens, will stay inline */
+  .chat-floating-btn {
+    position: static;
+    transform: none;
+  }
+}

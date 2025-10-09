@@ -131,9 +131,10 @@ export default function Schedule() {
 
   return (
     <Container className="schedule-container mt-4">
-      <h3 className="mb-4 text-center">Schedules</h3>
+      <h3 className="mb-4 text-center">Paluwagan Wheel</h3>
       <PickSchedule onScheduleAdded={fetchSchedules} />
 
+      <h3 className="mb-4 text-center">Kaluwag Schedule</h3>
       <Row xs={1} md={2} lg={3} className="g-4 mt-3">
         {schedules.map((schedule) => {
           const disabled = !schedule.isActive;

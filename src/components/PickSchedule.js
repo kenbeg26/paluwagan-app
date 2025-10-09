@@ -1,6 +1,5 @@
-// PickSchedule.js
 import React, { useState, useEffect, useContext } from "react";
-import { Button, Container, Spinner, Alert } from "react-bootstrap";
+import { Button, Container, Spinner, Modal } from "react-bootstrap";
 import { Wheel } from "react-custom-roulette";
 import UserContext from "../context/UserContext";
 
@@ -13,7 +12,7 @@ export default function PickSchedule({ onScheduleAdded }) {
   const [mustSpin, setMustSpin] = useState(false);
   const [prizeNumber, setPrizeNumber] = useState(0);
   const [hasSchedule, setHasSchedule] = useState(false);
-  const [spinAngle, setSpinAngle] = useState(0);
+  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -26,7 +25,6 @@ export default function PickSchedule({ onScheduleAdded }) {
         const available = Array.isArray(data)
           ? data.filter((p) => p.isActive && !p.isOccupied)
           : [];
-
         setProducts(available);
       } catch (err) {
         setError(err.message);
@@ -42,9 +40,7 @@ export default function PickSchedule({ onScheduleAdded }) {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         });
         const data = await res.json();
-        if (res.ok && Array.isArray(data) && data.length > 0) {
-          setHasSchedule(true);
-        }
+        if (res.ok && Array.isArray(data) && data.length > 0) setHasSchedule(true);
       } catch (err) {
         console.error(err);
       }
@@ -67,14 +63,8 @@ export default function PickSchedule({ onScheduleAdded }) {
     setError("");
     const idx = Math.floor(Math.random() * products.length);
     setPrizeNumber(idx);
-
-    // Faster spin with 10-12 full rotations
-    const sliceAngle = 360 / products.length;
-    const randomFullSpins = 10 + Math.random() * 2; // more rotations
-    const targetAngle = 360 * randomFullSpins + idx * sliceAngle + sliceAngle / 2;
-    setSpinAngle(targetAngle);
-
     setMustSpin(true);
+    setChosenProduct(null);
   };
 
   const onStopSpinning = async () => {
@@ -92,63 +82,52 @@ export default function PickSchedule({ onScheduleAdded }) {
           "Content-Type": "application/json",
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
+        body: JSON.stringify({ productId: product._id }),
       });
       const data = await res.json();
+
       if (!res.ok) {
         setError(data.message || "Failed to pick schedule");
         return;
       }
 
-      const picked = data.schedule?.scheduleOrdered?.[0]?.product;
-      setChosenProduct(picked || product);
+      // Show modal first, refresh after user closes
+      setChosenProduct(product);
+      setShowModal(true);
       setHasSchedule(true);
-
-      if (onScheduleAdded) onScheduleAdded();
     } catch (err) {
       setError(err.message || "Error picking schedule");
     }
   };
 
-  // Different colors for each slice (cycling your gold-tan theme)
-  // Rainbow slice colors 🌈
+  const handleCloseModal = () => {
+    setShowModal(false);
+    if (onScheduleAdded) onScheduleAdded();
+  };
+
   const sliceColors = [
-    "#d92b2bff", // Red
-    "#693706ff", // Orange
-    "#a4a403ff", // Yellow
-    "#00FF00", // Green
-    "#03038dff", // Blue
-    "#7905ccff", // Indigo
-    "#3d016eff", // Violet
-    "#be0166ff", // Deep Pink
-    "#04a7a9ff", // Dark Turquoise
-    "#e9c706ff", // Gold
+    "#d92b2bff", "#693706ff", "#a4a403ff", "#04b404ff", "#03038dff",
+    "#7905ccff", "#3d016eff", "#be0166ff", "#04a7a9ff", "#e9c706ff"
   ];
 
-  const wheelData = Array.isArray(products)
-    ? products.map((p, i) => ({
-      option: p.name || "Unnamed",
-      style: {
-        backgroundColor: sliceColors[i % sliceColors.length],
-        textColor: "#FFF5E1",
-      },
-    }))
-    : [];
+  const wheelData = products.map((p, i) => ({
+    option: p.name || "Unnamed",
+    style: { backgroundColor: sliceColors[i % sliceColors.length], textColor: "#FFF5E1" },
+  }));
 
   return (
     <Container className="my-4 text-center">
       {loading && <Spinner animation="border" />}
-      {error && <Alert variant="danger">{error}</Alert>}
+      {error && <div className="text-danger mb-2">{error}</div>}
 
-      {wheelData.length > 0 ? (
+      {wheelData.length > 0 && (
         <div style={{ width: "320px", margin: "0 auto" }}>
           <Wheel
             mustStartSpinning={mustSpin}
             prizeNumber={prizeNumber}
             data={wheelData}
             onStopSpinning={onStopSpinning}
-            spinDuration={4} // faster spin
-            startAngle={-90}
-            rotationAngle={spinAngle}
+            spinDuration={4}
             outerBorderColor="#c39b2f"
             outerBorderWidth={5}
             innerBorderColor="#c39b2f"
@@ -157,8 +136,6 @@ export default function PickSchedule({ onScheduleAdded }) {
             radiusLineWidth={2}
           />
         </div>
-      ) : (
-        <p className="text-muted mt-3">No active bundles to spin.</p>
       )}
 
       {!chosenProduct && !hasSchedule && user?.isActive && (
@@ -171,18 +148,21 @@ export default function PickSchedule({ onScheduleAdded }) {
         </Button>
       )}
 
-      {chosenProduct && (
-        <Alert variant="success" className="mt-3 p-3">
-          🎉 You got: <strong>{chosenProduct.name}</strong> (
-          ₱{chosenProduct.amount.toLocaleString()})
-        </Alert>
-      )}
-
-      {hasSchedule && !chosenProduct && (
-        <Alert variant="info" className="mt-3">
-          📅 You already picked a schedule
-        </Alert>
-      )}
+      {/* Prize Modal */}
+      <Modal show={showModal} onHide={handleCloseModal} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>🎉 Congratulations!</Modal.Title>
+        </Modal.Header>
+        <Modal.Body className="text-center">
+          You got: <strong>{chosenProduct?.name}</strong> <br />
+          Amount: ₱{chosenProduct?.amount.toLocaleString()}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="success" onClick={handleCloseModal}>
+            Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </Container>
   );
 }
