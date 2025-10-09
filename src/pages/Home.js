@@ -1,14 +1,15 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
+import UserContext from "../context/UserContext"; // if you have a context for user
 
 const Home = () => {
+  const { user } = useContext(UserContext); // get user from context
   const [quote, setQuote] = useState(null);
-  const [loading, setLoading] = useState(true); // only for first load
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [animationIndex, setAnimationIndex] = useState(0);
 
-  // List of animation files in /public/animation
   const animations = [
     "/animation/piggy1.gif",
     "/animation/piggy2.gif",
@@ -21,11 +22,11 @@ const Home = () => {
 
   const fetchRandomQuote = async (isFirst = false) => {
     try {
-      if (isFirst) setLoading(true); // only block UI first time
+      if (isFirst) setLoading(true);
       const response = await axios.get(
         `${process.env.REACT_APP_API_BASE_URL}/quotes/random`
       );
-      setQuote(response.data); // assuming { text, author }
+      setQuote(response.data);
       setError(null);
     } catch (err) {
       console.error("Error fetching quote:", err);
@@ -36,21 +37,17 @@ const Home = () => {
   };
 
   useEffect(() => {
-    // Preload animations so they don’t flash
     animations.forEach((src) => {
       const img = new Image();
       img.src = src;
     });
 
-    // Fetch first quote immediately
     fetchRandomQuote(true);
 
-    // Quote interval (every 15s)
     const quoteInterval = setInterval(() => {
       fetchRandomQuote();
     }, 15000);
 
-    // Animation interval (every 10s)
     const animationInterval = setInterval(() => {
       setAnimationIndex((prevIndex) => (prevIndex + 1) % animations.length);
     }, 10000);
@@ -64,7 +61,7 @@ const Home = () => {
   return (
     <div className="home-container">
       <div className="hero-section">
-        <h1 className="home-title">💰 Paluwagan Buddy</h1>
+        <h1 className="home-title">💰Paluwagan Buddy</h1>
 
         {/* Quote Section */}
         <blockquote className="home-quote">
@@ -86,14 +83,21 @@ const Home = () => {
           />
         </div>
 
+        {/* Tagline Section */}
+        <p className>
+          “Building financial goals together, one contribution at a time 🤝”
+        </p>
+
         {/* Navigation Buttons */}
         <div className="home-links">
           <Link to="/products" className="home-btn">
             View Bundles
           </Link>
-          <Link to="/schedule" className="home-btn">
-            View Schedule
-          </Link>
+          {user?.isActive && ( // Only show schedule button if user is active
+            <Link to="/schedule" className="home-btn">
+              View Schedule
+            </Link>
+          )}
         </div>
       </div>
     </div>

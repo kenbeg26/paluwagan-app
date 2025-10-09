@@ -12,7 +12,7 @@ import ProductCatalog from './pages/ProductCatalog';
 import Schedule from './pages/Schedule';
 import Chat from './components/Chat';
 import NotAuthorized from './pages/NotAuthorized';
-
+import Footer from "./components/Footer";
 
 function App() {
   const [user, setUser] = useState({
@@ -41,7 +41,6 @@ function App() {
     return element;
   }
 
-
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) return;
@@ -67,37 +66,35 @@ function App() {
       .catch(err => console.error("Error fetching user details:", err));
   }, []);
 
-
-
   return (
     <UserProvider value={{ user, setUser, unsetUser }}>
       <Router>
-        <AppNavbar />
-        <Container>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/logout" element={<Logout />} />
-            <Route path="/not-authorized" element={<NotAuthorized />} />
+        <div className="app-container">
+          <AppNavbar />
+          <div className="main-content">
+            <Container className="my-4">
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/register" element={<Register />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/logout" element={<Logout />} />
+                <Route path="/not-authorized" element={<NotAuthorized />} />
+                <Route path="/adminDashboard" element={<AdminDashboard />} />
+                <Route path="/products" element={<ProductCatalog />} />
+                <Route
+                  path="/schedule"
+                  element={<ProtectedRoute element={<Schedule />} user={user} />}
+                />
+                <Route
+                  path="/chat"
+                  element={<ProtectedRoute element={<Chat />} user={user} />}
+                />
+              </Routes>
+            </Container>
+          </div>
 
-            {/* Admin-only route (optional) */}
-            <Route path="/adminDashboard" element={<AdminDashboard />} />
-
-            <Route path="/products" element={<ProductCatalog />} />
-
-            {/* Protect these routes */}
-            <Route
-              path="/schedule"
-              element={<ProtectedRoute element={<Schedule />} user={user} />}
-            />
-            <Route
-              path="/chat"
-              element={<ProtectedRoute element={<Chat />} user={user} />}
-            />
-          </Routes>
-
-        </Container>
+          <Footer />
+        </div>
       </Router>
     </UserProvider>
   );

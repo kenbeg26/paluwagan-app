@@ -286,7 +286,7 @@ body {
 }
 
 .home-title {
-  font-size: 2.2rem;
+  font-size: 1.6rem;
   font-weight: 700;
   color: #D4AF37;
   /* Gold */
@@ -342,6 +342,16 @@ body {
 .home-btn:hover {
   background-color: #c39b2f;
   /* Darker gold hover */
+}
+
+.home-tagline {
+  font-size: 0.8rem;
+  /* Removed quotes and made it a single value */
+  color: #555;
+  margin-top: -10px;
+  /* Standard CSS uses hyphens */
+  margin-bottom: 20px;
+  /* Standard CSS uses hyphens */
 }
 
 /* ======================== */
@@ -734,4 +744,125 @@ body {
   /* Darker gold on hover */
   text-decoration: underline;
   /* Optional: underline on hover */
+}
+
+/* ======================== */
+/* 🌟 Navbar Styling */
+.custom-navbar {
+  background-color: #D4AF37;
+  /* Gold background */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 12px 0;
+}
+
+.navbar-brand-custom {
+  font-weight: 700;
+  color: #FFF5E1 !important;
+  /* Cream text */
+  font-size: 1.3rem;
+  letter-spacing: 0.5px;
+}
+
+.navbar-brand-custom:hover {
+  color: #FFF9F2 !important;
+}
+
+.custom-navbar .nav-link {
+  color: #FFF5E1 !important;
+  /* Cream links */
+  font-weight: 600;
+  margin: 0 8px;
+  transition: all 0.2s ease-in-out;
+}
+
+.custom-navbar .nav-link:hover {
+  color: #FFF9F2 !important;
+  /* Slightly lighter cream */
+  text-decoration: underline;
+}
+
+.custom-navbar .nav-link.active {
+  color: #FFF9F2 !important;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+/* Navbar toggle (hamburger) color for mobile */
+.navbar-toggler {
+  border-color: #FFF5E1;
+}
+
+.navbar-toggler-icon {
+  filter: invert(100%);
+}
+
+/* ======================== */
+/* 🌟 Footer Styling */
+.custom-footer {
+  background-color: #D4AF37;
+  /* Same gold as navbar */
+  color: #FFF5E1;
+  /* Cream text */
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.footer-text {
+  color: #FFF5E1;
+  font-weight: 600;
+  font-size: 0.95rem;
+  letter-spacing: 0.3px;
+}
+
+.footer-link {
+  color: #FFF9F2;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.footer-icon {
+  color: #FFF9F2;
+  /* Always visible */
+  font-size: 1.2rem;
+  /* Adjust size as needed */
+  transition: transform 0.3s ease, color 0.3s ease;
+  /* Smooth hover effect */
+  margin: 0 8px;
+  display: inline-block;
+}
+
+/* Hover effect */
+.footer-icon:hover {
+  color: #FFD700;
+  /* Gold on hover */
+  transform: scale(1.2);
+  /* Slightly enlarge on hover */
+}
+
+/* Make the body and root container full height */
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+/* App container flexbox */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* Main content should grow to fill space */
+.main-content {
+  flex: 1;
+}
+
+/* Footer stays at the bottom */
+.custom-footer {
+  background-color: #D4AF37;
+  color: #FFF5E1;
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  padding: 15px 0;
 }

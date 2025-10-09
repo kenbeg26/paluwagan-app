@@ -42,7 +42,15 @@ export default function Schedule() {
         `${process.env.REACT_APP_API_BASE_URL}/schedule/get-all-schedule`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      setSchedules(res.data);
+
+      // Sort schedules by lowest product number in each schedule
+      const sortedSchedules = res.data.slice().sort((a, b) => {
+        const aMin = Math.min(...a.scheduleOrdered.map(item => item.productId.number));
+        const bMin = Math.min(...b.scheduleOrdered.map(item => item.productId.number));
+        return aMin - bMin;
+      });
+
+      setSchedules(sortedSchedules);
     } catch (err) {
       console.error("Fetch schedules error:", err);
       setError("Failed to load schedules.");
@@ -135,52 +143,62 @@ export default function Schedule() {
               <Card className={`h-100 ${disabled ? "opacity-50" : ""}`}>
                 <Card.Body>
                   <Card.Title>
-                    {schedule.scheduleOrdered[0]?.productId?.category ||
-                      "Unknown Category"}
+                    {schedule.userId?.codename || "Unknown User"}
                   </Card.Title>
-                  <p>{schedule.userId?.codename || "Unknown User"}</p>
 
-                  {schedule.scheduleOrdered.map((item) => {
-                    const userIdStr = user?._id || user?.id;
-                    const userPaid = item.payments?.some(
-                      (p) =>
-                        String(p.userId) === String(userIdStr) &&
-                        p.status === "paid"
-                    );
+                  {schedule.scheduleOrdered[0]?.productId?.category ||
+                    "Unknown Category"}
 
-                    const totalPaidCount = item.payments?.filter(
-                      (p) => p.status === "paid"
-                    ).length;
+                  {schedule.scheduleOrdered
+                    .slice()
+                    .sort((a, b) => a.productId.number - b.productId.number)
+                    .map((item) => {
+                      const userIdStr = user?._id || user?.id;
+                      const userPaid = item.payments?.some(
+                        (p) =>
+                          String(p.userId) === String(userIdStr) &&
+                          p.status === "paid"
+                      );
 
-                    return (
-                      <div key={item._id} className="mb-3 p-2 border rounded">
-                        <h6>Schedule: {item.productId.name}</h6>
-                        <p>
-                          Amount: ₱{item.productId.amount.toLocaleString()} |
-                          Number: {item.productId.number}
-                        </p>
+                      const totalPaidCount = item.payments?.filter(
+                        (p) => p.status === "paid"
+                      ).length;
 
-                        <Badge bg={totalPaidCount > 0 ? "success" : "warning"}>
-                          {totalPaidCount > 0 ? "PAID" : "UNPAID"} (
-                          {totalPaidCount} user
-                          {totalPaidCount !== 1 ? "s" : ""} paid)
-                        </Badge>
+                      return (
+                        <div key={item._id} className="mb-3 p-2 border rounded">
+                          <h6>Schedule: {item.productId.name}</h6>
+                          <p>
+                            Amount: ₱
+                            {item.productId.amount.toLocaleString()} | Number:{" "}
+                            {item.productId.number}
+                          </p>
 
-                        <div className="mt-2">
-                          <Button
-                            variant={userPaid ? "secondary" : "success"}
-                            size="sm"
-                            disabled={disabled || userPaid}
-                            onClick={() =>
-                              confirmMarkAsPaid(schedule._id, item.productId._id)
-                            }
+                          <Badge
+                            bg={totalPaidCount > 0 ? "success" : "warning"}
                           >
-                            {userPaid ? "Already Paid" : "Mark as Paid"}
-                          </Button>
+                            {totalPaidCount > 0 ? "PAID" : "UNPAID"} (
+                            {totalPaidCount} user
+                            {totalPaidCount !== 1 ? "s" : ""} paid)
+                          </Badge>
+
+                          <div className="mt-2">
+                            <Button
+                              variant={userPaid ? "secondary" : "success"}
+                              size="sm"
+                              disabled={disabled || userPaid}
+                              onClick={() =>
+                                confirmMarkAsPaid(
+                                  schedule._id,
+                                  item.productId._id
+                                )
+                              }
+                            >
+                              {userPaid ? "Already Paid" : "Mark as Paid"}
+                            </Button>
+                          </div>
                         </div>
-                      </div>
-                    );
-                  })}
+                      );
+                    })}
                 </Card.Body>
                 <Card.Footer>
                   <strong>
@@ -189,9 +207,7 @@ export default function Schedule() {
                   <br />
                   Status:{" "}
                   <Badge
-                    bg={
-                      schedule.status === "settled" ? "success" : "secondary"
-                    }
+                    bg={schedule.status === "settled" ? "success" : "secondary"}
                   >
                     {schedule.status.toUpperCase()}
                   </Badge>
@@ -210,7 +226,9 @@ export default function Schedule() {
         <Modal.Header closeButton>
           <Modal.Title>Confirm Payment</Modal.Title>
         </Modal.Header>
-        <Modal.Body>Are you sure you want to mark this schedule as paid?</Modal.Body>
+        <Modal.Body>
+          Are you sure you want to mark this schedule as paid?
+        </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={() => setShowModal(false)}>
             Cancel

@@ -110,7 +110,20 @@ export default function PickSchedule({ onScheduleAdded }) {
   };
 
   // Different colors for each slice (cycling your gold-tan theme)
-  const sliceColors = ["#D4AF37", "#D2B48C", "#F0C987", "#FFD700", "#E6C07B", "#D4AF37"];
+  // Rainbow slice colors 🌈
+  const sliceColors = [
+    "#d92b2bff", // Red
+    "#693706ff", // Orange
+    "#a4a403ff", // Yellow
+    "#00FF00", // Green
+    "#03038dff", // Blue
+    "#7905ccff", // Indigo
+    "#3d016eff", // Violet
+    "#be0166ff", // Deep Pink
+    "#04a7a9ff", // Dark Turquoise
+    "#e9c706ff", // Gold
+  ];
+
   const wheelData = Array.isArray(products)
     ? products.map((p, i) => ({
       option: p.name || "Unnamed",
@@ -136,11 +149,11 @@ export default function PickSchedule({ onScheduleAdded }) {
             spinDuration={4} // faster spin
             startAngle={-90}
             rotationAngle={spinAngle}
-            outerBorderColor="#333"
+            outerBorderColor="#c39b2f"
             outerBorderWidth={5}
-            innerBorderColor="#fff"
+            innerBorderColor="#c39b2f"
             innerBorderWidth={5}
-            radiusLineColor="#fff"
+            radiusLineColor="#c39b2f"
             radiusLineWidth={2}
           />
         </div>
