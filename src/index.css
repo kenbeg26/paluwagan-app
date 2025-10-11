@@ -759,8 +759,8 @@ body {
   font-weight: 700;
   color: #FFF5E1 !important;
   /* Cream text */
-  font-size: 1.3rem;
-  letter-spacing: 0.5px;
+  font-size: 1rem;
+  letter-spacing: 0px;
 }
 
 .navbar-brand-custom:hover {
@@ -867,19 +867,31 @@ body,
   padding: 15px 0;
 }
 
+/* 🔧 Position the chat icon beside toggle on small screens */
 .chat-floating-btn {
   position: absolute;
-  right: 1rem;
   top: 50%;
+  right: 4.2rem;
+  /* gives space between icon and toggle */
   transform: translateY(-50%);
   z-index: 1050;
+  transition: top 0.3s ease;
+  /* smooth move when menu opens */
 }
 
-@media (min-width: 992px) {
+/* When navbar expands (menu open), move the chat icon down */
+.navbar-collapse.show~.chat-floating-btn {
+  top: calc(100% + 10px);
+  /* push icon below navbar */
+  transform: none;
+}
 
-  /* Remove floating effect on large screens, will stay inline */
+/* Normal position on large screens */
+@media (min-width: 992px) {
   .chat-floating-btn {
     position: static;
     transform: none;
+    right: 0;
+    top: auto;
   }
 }
