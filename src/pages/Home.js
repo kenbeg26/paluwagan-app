@@ -90,13 +90,15 @@ const Home = () => {
 
         {/* Navigation Buttons */}
         <div className="home-links">
-          <Link to="/products" className="home-btn">
-            View Bundles
-          </Link>
+
           {user?.isActive && ( // Only show schedule button if user is active
-            <Link to="/schedule" className="home-btn">
-              View Schedule
+            <><Link to="/products" className="home-btn">
+              View Bundles
             </Link>
+              <Link to="/schedule" className="home-btn">
+                View Schedule
+              </Link>
+            </>
           )}
         </div>
       </div>
